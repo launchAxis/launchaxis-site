@@ -3,138 +3,102 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#c7dfe2">
-  <title>LaunchAxis — Independent projects in AI, robotics & film</title>
-  <meta name="description" content="LaunchAxis is an independent project studio exploring AI, robotics and creative technology. Discover Aventis, Axis and Tide.">
-  <meta property="og:title" content="LaunchAxis — Ideas into motion.">
-  <meta property="og:description" content="Independent projects at the intersection of intelligence, motion and imagination.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://launchaxis.net/">
+  <meta name="theme-color" content="#111310">
+  <title>LaunchAxis — Ideas into motion.</title>
+  <meta name="description" content="An independent project studio exploring AI, robotics and film. Meet Aventis, Axis and Tide. Different disciplines. The same curiosity.">
   <link rel="canonical" href="https://launchaxis.net/">
-  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg?v=2">
-  <style>
-    /* EDIT THE PALETTE HERE. All styling is included in this file. */
-    :root{--ink:#2c3030;--muted:#596464;--paper:#fafbf8;--white:#fff;--ice:#c7dfe2;--line:#d9dfdc;--accent:#275c63;--radius:22px;--max:1200px}
-    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:100px}body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased;font-size:16px;line-height:1.6}
-    a{color:inherit;text-decoration:none}button{font:inherit}a,button,summary{-webkit-tap-highlight-color:transparent}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:5px}button{cursor:pointer}svg{display:block;max-width:100%}::selection{background:var(--ice);color:var(--ink)}[hidden]{display:none!important}
-    .wrap{width:min(var(--max),calc(100% - 80px));margin-inline:auto}.skip{position:absolute;left:20px;top:-80px;padding:10px 18px;background:var(--ink);color:white;z-index:20}.skip:focus{top:10px}
-    header{border-bottom:1px solid var(--line);background:var(--paper)}.header-inner{min-height:94px;display:flex;align-items:center;justify-content:space-between;gap:32px}.wordmark{display:block;width:260px;max-width:100%;flex-shrink:0;line-height:0}.wordmark svg{width:100%;height:auto;mix-blend-mode:multiply}.nav{display:flex;align-items:center;gap:29px;font-size:14px}.nav a{padding:8px 0}.nav a:hover{color:var(--accent)}.nav .contact-link{border-bottom:1px solid var(--ink)}
-    .eyebrow{font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;display:flex;align-items:center;gap:11px}.dot{height:7px;width:7px;background:var(--accent);border-radius:50%;display:inline-block;flex:none}
-    .hero{padding:74px 0 44px;display:grid;grid-template-columns:1.04fr 1fr;gap:44px;align-items:center}.hero h1{font-size:clamp(56px,6.6vw,89px);font-weight:500;letter-spacing:-5px;line-height:1.02;margin:28px 0}.hero h1 em{font-family:Georgia,'Times New Roman',serif;font-weight:400}.hero .intro{max-width:440px;font-size:18px;line-height:1.65;color:var(--muted);margin:0 0 28px}.button{display:inline-flex;align-items:center;justify-content:center;gap:30px;background:var(--ink);color:white;padding:14px 22px;border:1px solid var(--ink);border-radius:4px;font-size:14px;transition:background .2s,transform .2s}.button:hover{background:var(--accent);transform:translateY(-2px)}.button .arrow{font-size:21px;line-height:1}.hero-note{font-family:ui-monospace,Consolas,monospace;font-size:10px;letter-spacing:.8px;color:var(--muted);margin-top:24px}
-    .hero-art{background:var(--ice);aspect-ratio:1;position:relative;border-radius:var(--radius);overflow:hidden}.hero-art svg{height:100%;width:100%}.art-caption{position:absolute;left:25px;right:25px;bottom:20px;display:flex;justify-content:space-between;font:10px ui-monospace,Consolas,monospace;letter-spacing:1px}.art-top{position:absolute;left:25px;top:21px;font:10px ui-monospace,Consolas,monospace;letter-spacing:1px}
-    .disciplines{display:flex;align-items:center;justify-content:space-between;padding:23px 0 42px;border-bottom:1px solid var(--line);font:11px ui-monospace,Consolas,monospace;color:var(--muted)}.disciplines .list{display:flex;gap:26px}.disciplines .list span+span:before{content:'＋';margin-right:26px;color:#7d9294}
-    .about{padding:82px 0;display:grid;grid-template-columns:.72fr 1.5fr;gap:65px;border-bottom:1px solid var(--line)}.section-label{font:11px ui-monospace,Consolas,monospace;letter-spacing:1px;display:flex;align-items:baseline;gap:19px}.section-label .num{color:var(--accent)}.about h2{font-weight:400;letter-spacing:-1.2px;font-size:clamp(27px,3vw,39px);line-height:1.23;margin:0 0 22px}.about p{color:var(--muted);max-width:620px;margin:0}
-    .projects{padding:78px 0 85px;border-bottom:1px solid var(--line)}.section-heading{display:flex;justify-content:space-between;align-items:end;gap:25px;margin-bottom:32px}.section-heading h2{font-size:40px;line-height:1.1;font-weight:400;letter-spacing:-1.8px;margin:16px 0 0}.filters{display:flex;flex-wrap:wrap;gap:6px}.filter{border:1px solid var(--line);background:transparent;border-radius:40px;padding:8px 15px;font-size:12px;color:var(--ink)}.filter:hover{border-color:var(--accent)}.filter[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:white}.project-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}.project{min-width:0}.project-art{aspect-ratio:1.35;border-radius:14px;background:#e4eeed;overflow:hidden}.project-art svg{width:100%;height:100%}.project-art.dark{background:#2c383b;color:#cee3e5}.project-art.ocean{background:#c5dce0}.project-meta{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:22px 0 12px;font:10px ui-monospace,Consolas,monospace;text-transform:uppercase;letter-spacing:.7px;color:var(--muted)}.status{border:1px solid var(--line);padding:3px 8px;border-radius:20px;white-space:nowrap;font-size:9px}.project h3{font-size:29px;font-weight:500;line-height:1.1;letter-spacing:-.8px;margin:0 0 10px}.project p{font-size:14px;color:var(--muted);line-height:1.7;margin:0 0 18px}.project details{border-top:1px solid var(--line);font-size:13px}.project summary{cursor:pointer;padding:13px 0;color:var(--ink);list-style:none;display:flex;justify-content:space-between;gap:15px}.project summary::-webkit-details-marker{display:none}.project summary::after{content:'+';font-size:17px;line-height:1.4}.project details[open] summary::after{content:'−'}.project details p{font-size:13px}.caption{font:10px ui-monospace,Consolas,monospace;color:var(--muted);margin-top:26px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-    .notes{padding:65px 0 78px;display:grid;grid-template-columns:.72fr 1.5fr;gap:65px}.notes-body{display:flex;justify-content:space-between;align-items:center;gap:25px}.notes h2{font-size:29px;font-weight:400;letter-spacing:-.9px;margin:0 0 10px}.notes p{color:var(--muted);font-size:14px;max-width:440px;margin:0}.soon{white-space:nowrap;font:11px ui-monospace,Consolas,monospace;color:var(--accent);border-bottom:1px solid var(--accent);padding-bottom:5px}
-    .contact{background:var(--ink);color:var(--paper);padding:65px 0 34px}.contact .eyebrow{color:#c7dfe2}.contact-main{display:flex;justify-content:space-between;align-items:end;gap:35px;margin:24px 0 61px}.contact h2{font-size:clamp(36px,5vw,62px);font-weight:400;line-height:1.08;letter-spacing:-2.4px;margin:0 0 20px}.email-link{display:inline-flex;align-items:center;gap:20px;font-size:clamp(17px,2.2vw,24px);border-bottom:1px solid #829294;padding-bottom:6px}.email-link:hover{color:var(--ice)}.copy{background:transparent;border:1px solid #7a8989;color:var(--paper);border-radius:4px;padding:10px 17px;font-size:12px}.copy:hover{background:#3d4949}.copy:focus-visible,.contact a:focus-visible{outline-color:var(--ice)}.copy-status{font-size:11px;color:var(--ice);margin:10px 0 0;min-height:18px}.footer{display:flex;justify-content:space-between;gap:24px;padding-top:24px;border-top:1px solid #505a5a;color:#c1cece;font-size:11px}.footer a:hover{color:white}
-    @media(min-width:1500px){.hero{padding-top:95px;padding-bottom:60px}}
-    @media(max-width:900px){.wrap{width:calc(100% - 48px)}.hero{gap:25px;padding-top:48px}.hero h1{font-size:62px;letter-spacing:-3.7px}.hero .intro{font-size:16px}.hero-art{aspect-ratio:.9}.project-grid{gap:18px}.about,.notes{gap:30px;grid-template-columns:.6fr 1.4fr}.project-meta{flex-wrap:wrap;gap:6px}.nav{gap:20px}}
-    @media(max-width:650px){html{scroll-padding-top:25px}.wrap{width:calc(100% - 36px)}.header-inner{min-height:86px;align-items:flex-start;padding:18px 0;gap:12px;flex-direction:column}.wordmark{width:240px}.nav{width:100%;justify-content:space-between;gap:14px;font-size:12px}.nav a{padding:1px 0}.hero{grid-template-columns:1fr;padding:38px 0 28px;gap:32px}.hero h1{font-size:64px;margin:24px 0;letter-spacing:-3.9px}.hero .intro{max-width:360px;font-size:17px}.hero-art{aspect-ratio:1.16}.hero-note{margin-top:20px}.disciplines{font-size:9px;padding:0 0 28px;gap:15px;flex-wrap:wrap}.disciplines .list{gap:10px}.disciplines .list span+span:before{margin-right:10px}.about,.notes{grid-template-columns:1fr;gap:26px;padding:48px 0}.about h2{font-size:30px}.about p{font-size:15px}.projects{padding:47px 0}.section-heading{align-items:start;flex-direction:column;gap:23px}.section-heading h2{font-size:34px}.project-grid{grid-template-columns:1fr;gap:37px}.project-art{aspect-ratio:1.45}.project-meta{flex-wrap:nowrap;margin-top:18px}.project h3{font-size:30px}.project p{font-size:15px}.notes-body{align-items:start;flex-direction:column;gap:20px}.contact{padding:48px 0 26px}.contact-main{align-items:start;flex-direction:column;margin-bottom:35px;gap:26px}.contact h2{font-size:43px;letter-spacing:-1.9px}.footer{flex-wrap:wrap;gap:12px;font-size:10px}.caption{line-height:1.6}}
-    @media(max-width:650px){.art-caption{left:18px;right:18px;bottom:14px;font-size:8px;letter-spacing:.15px;gap:8px}.art-caption span{white-space:nowrap}}
-    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.button{transition:none}.button:hover{transform:none}}
-    @media print{.hero-art,.project-art,.filters,.copy-area{display:none}.wrap{width:100%}.hero,.about,.notes{display:block;padding:25px 0}.project-grid{display:block}.project{break-inside:avoid}.contact{background:white;color:black}.footer{color:black}a[href^='mailto:']{text-decoration:underline}}
-  </style>
+  <!-- PNG is provided for search engines; SVG is retained for browser tabs. -->
+  <link rel="icon" type="image/png" sizes="1254x1254" href="/favicon.png">
+  <link rel="icon" type="image/svg+xml" sizes="any" href="/assets/favicon.svg">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="LaunchAxis">
+  <meta property="og:title" content="LaunchAxis — Ideas into motion.">
+  <meta property="og:description" content="AI. Robotics. Film. An independent studio for ideas that don't sit still.">
+  <meta property="og:url" content="https://launchaxis.net/">
+  <meta property="og:image" content="https://launchaxis.net/assets/launchaxis-wordmark.png">
+  <meta property="og:image:alt" content="LaunchAxis wordmark">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="/assets/site.css">
+  <link rel="stylesheet" href="/assets/render.css">
+  <script src="/assets/site.js" defer></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"LaunchAxis","url":"https://launchaxis.net/"}</script>
 </head>
 <body id="top">
   <a class="skip" href="#main">Skip to content</a>
-  <header>
-    <div class="wrap header-inner">
-      <a class="wordmark" href="#top" aria-label="LaunchAxis home">
-        <!-- Display the approved artwork without altering its letter shapes. -->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="80 205 2010 255" width="260" height="33" aria-hidden="true" focusable="false"><image href="/assets/launchaxis-wordmark.png" x="0" y="0" width="2172" height="724"/></svg>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="header">
+    <div class="shell header-inner">
+      <a class="brand" href="#top" aria-label="LaunchAxis home">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="80 205 2010 255" width="230" height="29" aria-hidden="true" focusable="false"><image href="/assets/launchaxis-wordmark.png" width="2172" height="724"/></svg>
       </a>
-      <nav class="nav" aria-label="Main navigation"><a href="#about">About</a><a href="#projects">Projects</a><a href="#notes">Notes</a><a class="contact-link" href="#contact">Get in touch <span aria-hidden="true">↗</span></a></nav>
+      <nav class="main-nav" aria-label="Main navigation"><a href="#projects">The work <span>03</span></a><a href="#about">The studio</a><a href="#contact">Connect <span aria-hidden="true">↗</span></a></nav>
+      <button class="motion-toggle" type="button" aria-pressed="false" hidden><span class="motion-glyph" aria-hidden="true">Ⅱ</span><span class="motion-label">Pause motion</span></button>
     </div>
   </header>
   <main id="main">
-    <div class="wrap">
-      <section class="hero" aria-labelledby="hero-title">
-        <div>
-          <div class="eyebrow"><span class="dot" aria-hidden="true"></span> Independent project studio</div>
-          <h1 id="hero-title">Ideas into<br><em>motion.</em></h1>
-          <p class="intro">Exploring what happens when intelligence, engineering and imagination meet.</p>
-          <a class="button" href="#projects">Explore the projects <span class="arrow" aria-hidden="true">↗</span></a>
-          <p class="hero-note">AI / ROBOTICS / CREATIVE TECHNOLOGY</p>
-        </div>
-        <div class="hero-art" aria-hidden="true">
-          <span class="art-top">LA / EXPLORATIONS</span>
-          <!-- Abstract artwork, not a diagram of any project architecture. -->
-          <svg viewBox="0 0 540 540" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs><pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#365a60" opacity=".17"/></pattern><linearGradient id="sphere" x1="155" y1="145" x2="370" y2="390" gradientUnits="userSpaceOnUse"><stop stop-color="#eff9f8"/><stop offset=".5" stop-color="#91b6bf"/><stop offset="1" stop-color="#335961"/></linearGradient><radialGradient id="glow"><stop stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
-            <rect width="540" height="540" fill="url(#grid)"/><circle cx="250" cy="240" r="230" fill="url(#glow)"/>
-            <path d="M60 440 452 102M60 275H480M270 60V475" stroke="#547b80" stroke-width="1" opacity=".35"/>
-            <circle cx="270" cy="270" r="155" stroke="#436b73" opacity=".3" stroke-dasharray="3 7"/>
-            <ellipse cx="270" cy="270" rx="218" ry="65" transform="rotate(-35 270 270)" stroke="#4e7880" stroke-width="1.3"/>
-            <circle cx="270" cy="270" r="110" fill="url(#sphere)"/>
-            <path d="M172 220C192 171 246 150 297 165" stroke="#eaf8f8" stroke-width="1.5" opacity=".65"/>
-            <path d="M88 384C119 427 230 403 333 331S501 186 452 147" stroke="#2c4c55" stroke-width="1.5"/>
-            <ellipse cx="270" cy="270" rx="218" ry="65" transform="rotate(40 270 270)" stroke="#3d656c" stroke-width="1.1"/>
-            <circle cx="414" cy="153" r="13" fill="#2c3030"/><circle cx="108" cy="332" r="7" fill="#f8fcf9" stroke="#597e85"/><circle cx="378" cy="390" r="9" fill="#f8fcf9" stroke="#597e85"/>
-            <path d="M414 140V112H465M108 339V383H56M378 399V441H439" stroke="#597e85" stroke-width="1"/>
-            <g fill="#2c484e" font-family="Arial,sans-serif" font-size="10" letter-spacing="1.3"><text x="397" y="101">INTELLIGENCE</text><text x="44" y="401">MOTION</text><text x="378" y="460">IMAGINATION</text></g>
-            <path d="M45 60V45H60M480 45H495V60M45 480V495H60M480 495H495V480" stroke="#4b737a"/>
-          </svg>
-          <div class="art-caption"><span>THREE FIELDS. SHARED CURIOSITY.</span><span>01—03</span></div>
-        </div>
-      </section>
-      <div class="disciplines" aria-hidden="true"><div class="list"><span>Think deeply</span><span>Build deliberately</span><span>Keep exploring</span></div><span>A WORK IN PROGRESS ↗</span></div>
-      <section class="about" id="about" aria-labelledby="about-title">
-        <div class="section-label"><span class="num">01 /</span> THE STUDIO</div>
-        <div><h2 id="about-title">Different disciplines.<br>The same curiosity.</h2><p>LaunchAxis is my independent project studio: a home for technical experiments and creative work. From exploring cooperation between AI models to building a robotic arm or shaping a world in Blender, each project starts with a question—and develops through learning, making and iteration.</p></div>
-      </section>
-      <section class="projects" id="projects" aria-labelledby="projects-title">
-        <div class="section-heading"><div><div class="section-label"><span class="num">02 /</span> EXPLORATIONS</div><h2 id="projects-title">Work in progress.</h2></div>
-          <div class="filters" aria-label="Filter projects" hidden><button class="filter" type="button" data-filter="all" aria-pressed="true" aria-controls="project-grid">All work</button><button class="filter" type="button" data-filter="ai" aria-pressed="false" aria-controls="project-grid">AI</button><button class="filter" type="button" data-filter="robotics" aria-pressed="false" aria-controls="project-grid">Robotics</button><button class="filter" type="button" data-filter="film" aria-pressed="false" aria-controls="project-grid">Film</button></div>
-        </div>
-        <p class="sr-only" id="filter-status" aria-live="polite"></p>
-        <!-- EDIT PROJECT COPY directly in these three articles. -->
-        <div class="project-grid" id="project-grid">
-          <article class="project" data-category="ai">
-            <div class="project-art" aria-hidden="true"><svg viewBox="0 0 380 280" fill="none"><g stroke="#73989e"><path d="M98 82 190 140 280 68M190 140 300 206M190 140 91 210M98 82 280 68 300 206 91 210Z"/><circle cx="190" cy="140" r="80" stroke-dasharray="3 7" opacity=".5"/><circle cx="190" cy="140" r="108" opacity=".18"/></g><g fill="#f9fcfa" stroke="#658c94"><circle cx="98" cy="82" r="19"/><circle cx="280" cy="68" r="19"/><circle cx="300" cy="206" r="19"/><circle cx="91" cy="210" r="19"/></g><circle cx="190" cy="140" r="31" fill="#365b64"/><path d="M178 140h24M190 128v24" stroke="#d8ecec" stroke-width="1.5"/><g fill="#446a71"><circle cx="98" cy="82" r="4"/><circle cx="280" cy="68" r="4"/><circle cx="300" cy="206" r="4"/><circle cx="91" cy="210" r="4"/></g></svg></div>
-            <div class="project-meta"><span>01 / Artificial intelligence</span><span class="status">In development</span></div><h3>Aventis</h3><p>Exploring cooperation between AI models. An independent project investigating how models can work together.</p>
-            <details><summary>About the project</summary><p>Aventis is an ongoing AI development project. Technical details and results are not being published here at this stage.</p></details>
-          </article>
-          <article class="project" data-category="robotics">
-            <div class="project-art dark" aria-hidden="true"><svg viewBox="0 0 380 280" fill="none"><g stroke="#78969c" opacity=".3"><path d="m30 231 160-62 160 62-160 60ZM30 231h320M190 169v110M80 211l160 62M135 190l160 62M80 252l160-62M135 273l160-62"/></g><path d="M108 226h72l12 12H96Z" fill="#6f939a" stroke="#b8d5d9"/><path d="M140 226v-46l-33-55 78-53 61 54" stroke="#c7dfe2" stroke-width="17" stroke-linejoin="round"/><path d="M140 226v-46l-33-55 78-53 61 54" stroke="#72979e" stroke-width="4"/><g fill="#2c383b" stroke="#d0e3e5" stroke-width="3"><circle cx="140" cy="180" r="12"/><circle cx="107" cy="125" r="12"/><circle cx="185" cy="72" r="12"/></g><path d="m240 120 17 2 10 15-8 17M246 126l-1 18 12 10" stroke="#cee3e5" stroke-width="5"/><path d="m280 204 14-8 14 8v16l-14 8-14-8Z" stroke="#a2c4ca"/><path d="m280 204 14 8 14-8M294 212v16" stroke="#a2c4ca"/><path d="M256 157q49 4 38 32" stroke="#8aadb4" stroke-dasharray="3 5"/></svg></div>
-            <div class="project-meta"><span>02 / Robotics</span><span class="status">Experimental</span></div><h3>Axis</h3><p>Bringing ideas into the physical world. Robotics experiments in simulation, control and learning, beginning with a custom arm.</p>
-            <details><summary>About the project</summary><p>A space to develop the robotic-arm project, explore movement in simulation and document what is learned along the way.</p></details>
-          </article>
-          <article class="project" data-category="film">
-            <div class="project-art ocean" aria-hidden="true"><svg viewBox="0 0 380 280" fill="none"><circle cx="280" cy="76" r="31" fill="#edf5ee"/><path d="M0 153q62-33 126-3t127 0 127 5V280H0Z" fill="#94b8c0"/><path d="M0 189q61-37 125-9t127-1 128 4V280H0Z" fill="#739ca9"/><path d="M0 228q60-35 124-9t128-3 128 4V280H0Z" fill="#507987"/><path d="m137 165 26 20h56l18-20Z" fill="#2c4149"/><path d="M189 163V83" stroke="#2c4149" stroke-width="3"/><path d="m184 91-33 64h33Z" fill="#f5f8ef"/><path d="m195 102 26 53h-26Z" fill="#e3eeeb"/><path d="M54 202q25-8 48-2M255 237q37-7 69-1M27 256q26-10 55-3" stroke="#c7dfe2" opacity=".65"/></svg></div>
-            <div class="project-meta"><span>03 / Animation & film</span><span class="status">In development</span></div><h3>Tide</h3><p>A boat. An open ocean. A world in motion. A Blender short-film project exploring an unfolding journey across the water.</p>
-            <details><summary>About the project</summary><p>A creative exploration of atmosphere, water and visual storytelling. The film remains in development; no release date has been announced.</p></details>
-          </article>
-        </div>
-        <p class="caption">Illustrations are conceptual—not product screenshots, technical diagrams or film stills.</p>
-      </section>
-      <section class="notes" id="notes" aria-labelledby="notes-title"><div class="section-label"><span class="num">03 /</span> FIELD NOTES</div><div class="notes-body"><div><h2 id="notes-title">Ideas worth writing down.</h2><p>Essays, development notes and reflections on building across disciplines. A place for the questions as well as the answers.</p></div><span class="soon">Coming soon ↗</span></div></section>
-    </div>
-    <section class="contact" id="contact" aria-labelledby="contact-title"><div class="wrap"><div class="eyebrow">Stay curious. Get in touch.</div><div class="contact-main"><div><h2 id="contact-title">Good ideas start<br>with a conversation.</h2><a class="email-link" href="mailto:hello@launchaxis.net">hello@launchaxis.net <span aria-hidden="true">↗</span></a></div><div class="copy-area" hidden><button type="button" class="copy" id="copy-email">Copy email address</button><p class="copy-status" id="copy-status" role="status"></p></div></div><footer class="footer"><span>© <span id="year">2026</span> LaunchAxis · Independent project studio</span><a href="#top">Back to top ↑</a></footer></div></section>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-grid" aria-hidden="true"></div>
+      <div class="shell hero-content">
+        <p class="eyebrow"><span class="signal" aria-hidden="true"></span> An independent project studio</p>
+        <h1 id="hero-title"><span>Ideas into</span><span class="hero-last">motion<span class="lime">.</span></span></h1>
+        <div class="hero-bottom-copy"><p>Intelligence. Engineering. Imagination.<br>Different ways to ask <em>what if.</em></p><a class="round-link" href="#projects"><span>Explore the work</span><span class="round-arrow" aria-hidden="true">↓</span></a></div>
+      </div>
+      <div class="hero-sculpture" aria-hidden="true"><canvas id="axis-core"></canvas><div class="core-fallback"><i></i><i></i><i></i></div><span class="core-label">LA — EXPLORATION / 001</span><span class="core-coordinate">FORM IN MOTION</span></div>
+      <div class="shell hero-bottom"><span class="mono">Built on curiosity. Always in progress.</span><span class="mono scroll-hint">Scroll to explore <span aria-hidden="true">↓</span></span></div>
+    </section>
+    <div class="discipline-strip" aria-label="Explore by discipline"><div class="shell discipline-links"><a href="#aventis"><span class="mono">01 /</span> Intelligence <span aria-hidden="true">↗</span></a><a href="#axis"><span class="mono">02 /</span> Motion <span aria-hidden="true">↗</span></a><a href="#tide"><span class="mono">03 /</span> Imagination <span aria-hidden="true">↗</span></a></div></div>
+
+    <section class="work-section" id="projects" aria-labelledby="work-title">
+      <div class="shell work-heading"><div><p class="eyebrow">01 — Selected explorations</p><h2 class="display" id="work-title" data-reveal>Three worlds.<br><span class="dim">One curiosity.</span></h2></div><div class="work-intro"><p>Not one lane.<br>A place to build across them.</p><p class="muted">Ongoing experiments in how we think, how things move, and how stories feel.</p></div></div>
+      <div class="work-toolbar"><div class="shell toolbar-inner"><nav class="project-nav" aria-label="Project shortcuts"><a href="#aventis" data-project-link="aventis"><span>01</span> Aventis</a><a href="#axis" data-project-link="axis"><span>02</span> Axis</a><a href="#tide" data-project-link="tide"><span>03</span> Tide</a></nav><div class="filters" role="group" aria-label="Filter projects" hidden><button type="button" data-filter="all" aria-pressed="true">All</button><button type="button" data-filter="ai" aria-pressed="false">AI</button><button type="button" data-filter="robotics" aria-pressed="false">Robotics</button><button type="button" data-filter="film" aria-pressed="false">Film</button></div></div></div>
+      <p class="sr-only" id="filter-status" role="status"></p>
+      <div class="shell project-list">
+        <article class="project aventis" id="aventis" data-category="ai" aria-labelledby="aventis-title">
+          <div class="project-top"><span class="mono">01 / ARTIFICIAL INTELLIGENCE</span><span class="status"><span aria-hidden="true"></span> In development</span></div>
+          <div class="project-layout">
+            <div class="project-copy"><h3 id="aventis-title" class="project-name" data-reveal>Aventis<span class="lime">.</span></h3><h4>Intelligence,<br>in conversation.</h4><p>What happens when AI models work together? Aventis explores cooperation between models—and the questions that emerge along the way.</p><div class="tags"><span>AI</span><span>Cooperation</span><span>Exploration</span></div><details><summary>Inside the project <span aria-hidden="true">+</span></summary><div><p>An independent AI development project, previously called Synapse. Technical details and results are not being published here at this stage.</p><p class="muted">The visual alongside is an abstract illustration of connection, not a model architecture or live system.</p></div></details></div>
+            <div class="project-visual network-visual" data-reveal><div class="visual-label mono"><span>CONNECTION STUDY</span><span>001</span></div><canvas id="network-canvas" aria-hidden="true"></canvas><div class="network-fallback" aria-hidden="true"><i></i><i></i><i></i><b></b></div><svg class="aventis-brand" xmlns="http://www.w3.org/2000/svg" viewBox="650 265 750 295" aria-label="Aventis logo" role="img"><image href="/assets/aventis-logo.png" width="2048" height="853"/></svg><p class="visual-foot mono">Multiple perspectives. A shared question.</p></div>
+          </div>
+        </article>
+        <article class="project axis" id="axis" data-category="robotics" aria-labelledby="axis-title">
+          <div class="project-top"><span class="mono">02 / ROBOTICS</span><span class="status"><span aria-hidden="true"></span> Experimental</span></div>
+          <div class="project-layout axis-layout">
+            <div class="project-copy"><h3 id="axis-title" class="project-name" data-reveal>Axis<span class="lime">.</span></h3><h4>From an idea<br>to a movement.</h4><p>A robotic arm. A simulated world. An exploration of control, reaching, and learning—one experiment at a time.</p><div class="tags"><span>Robotics</span><span>Simulation</span><span>Control</span></div><details><summary>Inside the project <span aria-hidden="true">+</span></summary><div><p>Axis is the home of the robotic-arm project: exploring movement in simulation and documenting what is learned along the way.</p><p>The arm currently being tested is designed by <a class="credit-link" href="https://fabricreator.com/en" target="_blank" rel="noopener noreferrer">FabriCreator ↗</a>. The image and clip shown here are LaunchAxis rendering tests, not footage of a physical robot or a successful AI training run.</p></div></details></div>
+            <figure class="render-block" data-reveal>
+              <div class="render-player project-visual"><div class="visual-label mono"><span>RENDERING TEST</span><span>002</span></div>
+                <video id="axis-video" class="axis-video" controls playsinline muted loop preload="none" poster="/assets/axis-render.png" aria-label="Rendering test of the robotic arm designed by FabriCreator"><source src="/assets/axis-render.mp4" type="video/mp4">Your browser cannot play this video. <a href="/assets/axis-render.mp4">Watch the rendering test.</a></video>
+                <button class="film-toggle" type="button" aria-controls="axis-video" aria-pressed="false" hidden><span class="play-symbol" aria-hidden="true">▶</span><span class="film-label">Play render</span></button>
+              </div>
+              <div class="render-scrub" hidden><label for="arm-range" class="mono">Scrub the render</label><input id="arm-range" type="range" min="0" max="100" value="0" aria-label="Robotic arm rendering playback position"></div>
+              <figcaption>Arm design by <a href="https://fabricreator.com/en" target="_blank" rel="noopener noreferrer">FabriCreator ↗</a><span>Rendering test by LaunchAxis.</span></figcaption>
+            </figure>
+          </div>
+        </article>
+        <article class="project tide" id="tide" data-category="film" aria-labelledby="tide-title">
+          <div class="project-top"><span class="mono">03 / ANIMATION &amp; FILM</span><span class="status"><span aria-hidden="true"></span> In development</span></div>
+          <div class="tide-cinema" data-reveal>
+            <video id="tide-video" class="tide-video" controls playsinline muted loop preload="none" poster="/assets/tide-poster.jpg" aria-label="Tide work-in-progress sample: a wooden boat floating on water"><source src="/assets/tide-scene.mp4" type="video/mp4">Your browser cannot play this video. <a href="/assets/tide-scene.mp4">Watch the Tide sample.</a></video>
+            <div class="cinema-shade" aria-hidden="true"></div><div class="cinema-top mono"><span>BLENDER / WORK-IN-PROGRESS SCENE</span><span>00:08</span></div><h3 id="tide-title" class="tide-title">Tide</h3>
+            <button class="film-toggle" type="button" aria-controls="tide-video" aria-pressed="false" hidden><span class="play-symbol" aria-hidden="true">▶</span><span class="film-label">Play scene</span></button>
+          </div>
+          <div class="tide-description"><h4>A small boat.<br>A world of possibility.</h4><div><p>An unfolding journey across the water. Tide is a Blender short-film project exploring atmosphere, movement, and visual storytelling.</p><p class="muted">An actual sample scene from the project—not a finished trailer. The film is still in development; no release date has been announced.</p><div class="tags"><span>Blender</span><span>Animation</span><span>Storytelling</span></div></div></div>
+        </article>
+      </div>
+    </section>
+    <section class="studio" id="about" aria-labelledby="studio-title"><div class="shell studio-inner"><p class="eyebrow">02 — The studio</p><div class="studio-copy"><h2 id="studio-title" class="display" data-reveal>Curiosity doesn't<br>stay in one lane.<br><span>Neither do I.</span></h2><div class="studio-body"><p>LaunchAxis is my independent project studio—a home for technical experiments and creative work.</p><p>AI, robotics, and film might look like different worlds. Here, they're different ways of exploring the same impulse: to understand something, make something, and see where it leads.</p></div></div><div class="principles"><div><span class="mono">01 / THINK</span><h3>Start with a question.</h3><p>Make room for ideas that don't fit neatly into a category.</p></div><div><span class="mono">02 / MAKE</span><h3>Give it a form.</h3><p>A model, a movement, a scene. Turn the question into something to explore.</p></div><div><span class="mono">03 / ITERATE</span><h3>Keep finding out.</h3><p>Stay open to what the process teaches. The work is never just the result.</p></div></div></div></section>
+    <section class="notes shell" id="notes" aria-labelledby="notes-title"><div><p class="eyebrow">From the workbench</p><h2 id="notes-title">The questions behind the work.</h2></div><div><p>Development notes, experiments, and things learned along the way.</p><span class="mono notes-soon">Field notes — coming soon <span aria-hidden="true">↗</span></span></div></section>
+    <section class="contact" id="contact" aria-labelledby="contact-title"><div class="shell"><p class="eyebrow">03 — Keep in touch</p><div class="contact-heading"><h2 id="contact-title" class="display" data-reveal>Good things start<br>with <span class="lime">hello.</span></h2><a class="contact-arrow" href="mailto:hello@launchaxis.net" aria-label="Email LaunchAxis"><span aria-hidden="true">↗</span></a></div><div class="email-row"><a href="mailto:hello@launchaxis.net" class="email-link">hello@launchaxis.net</a><button type="button" class="copy-email" hidden>Copy email <span aria-hidden="true">⧉</span></button><span class="copy-status" role="status"></span></div>
+      <div class="social-heading"><h3>Find LaunchAxis</h3><span class="mono">Around the internet ↗</span></div><nav class="social-grid" aria-label="LaunchAxis social profiles">
+        <a href="https://github.com/launchAxis" target="_blank" rel="noopener noreferrer"><span class="social-number mono">01</span><div><span class="social-name">GitHub</span><span class="social-handle">LaunchAxis</span></div><span class="social-arrow" aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+        <a href="https://www.youtube.com/@Launch_Axis" target="_blank" rel="noopener noreferrer"><span class="social-number mono">02</span><div><span class="social-name">YouTube</span><span class="social-handle">@Launch_Axis</span></div><span class="social-arrow" aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+        <a href="https://www.instagram.com/launchaxis_/" target="_blank" rel="noopener noreferrer"><span class="social-number mono">03</span><div><span class="social-name">Instagram</span><span class="social-handle">@LaunchAxis_</span></div><span class="social-arrow" aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+        <a href="https://huggingface.co/LaunchAxis" target="_blank" rel="noopener noreferrer"><span class="social-number mono">04</span><div><span class="social-name">Hugging Face</span><span class="social-handle">LaunchAxis</span></div><span class="social-arrow" aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+        <a href="https://x.com/LaunchAxis_" target="_blank" rel="noopener noreferrer"><span class="social-number mono">05</span><div><span class="social-name">X</span><span class="social-handle">@LaunchAxis_</span></div><span class="social-arrow" aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+        <a href="https://www.tiktok.com/@launchaxis_" target="_blank" rel="noopener noreferrer"><span class="social-number mono">06</span><div><span class="social-name">TikTok</span><span class="social-handle">@LaunchAxis_</span></div><span class="social-arrow" aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+      </nav>
+      <div class="footer-brand" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="80 205 2010 255"><image href="/assets/launchaxis-wordmark.png" width="2172" height="724"/></svg></div>
+      <footer class="footer mono"><span>© <span id="year">2026</span> LaunchAxis</span><span>Independent by design.</span><a href="#top">Back to top ↑</a></footer>
+    </div></section>
   </main>
-  <script>
-    // Progressive enhancement: the complete site also works without JavaScript.
-    (() => {
-      const filters = document.querySelector('.filters');
-      const buttons = [...filters.querySelectorAll('button')];
-      const projects = [...document.querySelectorAll('.project')];
-      filters.hidden = false;
-      buttons.forEach(button => button.addEventListener('click', () => {
-        const key = button.dataset.filter;
-        buttons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
-        let count = 0;
-        projects.forEach(project => {project.hidden = key !== 'all' && project.dataset.category !== key; if (!project.hidden) count++;});
-        document.querySelector('#filter-status').textContent = `${count} ${count === 1 ? 'project' : 'projects'} shown.`;
-      }));
-      document.querySelector('#year').textContent = String(new Date().getFullYear());
-      if (navigator.clipboard && window.isSecureContext) {
-        document.querySelector('.copy-area').hidden = false;
-        document.querySelector('#copy-email').addEventListener('click', async () => {
-          const status = document.querySelector('#copy-status');
-          try {await navigator.clipboard.writeText('hello@launchaxis.net'); status.textContent = 'Email address copied.';}
-          catch {status.textContent = 'Select and copy hello@launchaxis.net above.';}
-        });
-      }
-    })();
-  </script>
 </body>
 </html>

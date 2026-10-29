@@ -22,9 +22,11 @@
   <link rel="stylesheet" href="/assets/render.css">
   <link rel="stylesheet" href="/assets/scroll-scenes.css">
   <link rel="stylesheet" href="/assets/editorial.css">
+  <link rel="stylesheet" href="/assets/kinetic.css">
   <script src="/assets/site.js" defer></script>
   <script type="module" src="/assets/scroll-scenes.js"></script>
   <script src="/assets/editorial.js" defer></script>
+  <script src="/assets/kinetic.js" defer></script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"LaunchAxis","url":"https://launchaxis.net/"}</script>
 </head>
 <body id="top">
@@ -36,7 +38,6 @@
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="80 205 2010 255" width="230" height="29" aria-hidden="true" focusable="false"><image href="/assets/launchaxis-wordmark.png" width="2172" height="724"/></svg>
       </a>
       <nav class="main-nav" aria-label="Main navigation"><a href="#projects">The work <span>03</span></a><a href="#about">The studio</a><a href="#contact">Connect <span aria-hidden="true">↗</span></a></nav>
-      <button class="motion-toggle" type="button" aria-pressed="false" hidden><span class="motion-glyph" aria-hidden="true">Ⅱ</span><span class="motion-label">Pause motion</span></button>
     </div>
   </header>
   <main id="main">
@@ -56,7 +57,18 @@
       </div>
     </section>
     <section class="manifesto" aria-labelledby="manifesto-title"><div class="shell"><p class="eyebrow">A place for the what if.</p><h2 id="manifesto-title" class="reading-statement">An idea is only the beginning. Make it think. Make it move. Make it mean something.</h2><div class="manifesto-bottom"><span class="manifesto-mark" aria-hidden="true">↗</span><p>LaunchAxis brings technical experiments and creative work into one place. Three projects. Different disciplines. The same drive to find out what comes next.</p></div></div></section>
-    <div class="discipline-strip" aria-label="Explore by discipline"><div class="shell discipline-links"><a href="#aventis"><span class="mono">01 /</span> Intelligence <span aria-hidden="true">↗</span></a><a href="#axis"><span class="mono">02 /</span> Motion <span aria-hidden="true">↗</span></a><a href="#tide"><span class="mono">03 /</span> Imagination <span aria-hidden="true">↗</span></a></div></div>
+    <section class="discipline-strip" aria-label="Explore by discipline">
+      <div class="discipline-stage">
+        <p class="eyebrow discipline-intro">Different worlds. One curiosity.</p>
+        <div class="discipline-images" aria-hidden="true">
+          <figure class="discipline-image discipline-ai"><img src="/assets/aventis-logo.png" alt="" loading="lazy"><figcaption class="mono">01 / AVENTIS</figcaption></figure>
+          <figure class="discipline-image discipline-arm"><img src="/assets/axis-render.png" alt="" loading="lazy"><figcaption class="mono">02 / AXIS</figcaption></figure>
+          <figure class="discipline-image discipline-boat"><img src="/assets/tide-poster.jpg" alt="" loading="lazy"><figcaption class="mono">03 / TIDE</figcaption></figure>
+        </div>
+        <nav class="discipline-links"><a href="#aventis"><span class="mono">01 /</span><span class="discipline-word">Intelligence</span><span aria-hidden="true">↗</span></a><a href="#axis"><span class="mono">02 /</span><span class="discipline-word">Motion</span><span aria-hidden="true">↗</span></a><a href="#tide"><span class="mono">03 /</span><span class="discipline-word">Imagination</span><span aria-hidden="true">↗</span></a></nav>
+        <p class="discipline-footer mono">Three projects / An open-ended exploration <span>Scroll to discover ↓</span></p>
+      </div>
+    </section>
 
     <section class="work-section" id="projects" aria-labelledby="work-title">
       <div class="shell work-heading"><div><p class="eyebrow">01 — Selected explorations</p><h2 class="display" id="work-title" data-reveal>One curiosity.<br><span class="dim">Many possibilities.</span></h2></div><div class="work-intro"><p>From a first question<br>to something you can see.</p><p class="muted">Explore the projects in progress.</p></div></div>
@@ -84,29 +96,26 @@
               </div>
               <p class="render-caption-label mono" hidden>Original rendering test ↓</p>
               <div class="render-player project-visual"><div class="visual-label mono"><span>RENDERING TEST</span><span>002</span></div>
-                <video id="axis-video" class="axis-video" controls playsinline muted loop preload="none" poster="/assets/axis-render.png" aria-label="Rendering test of the robotic arm designed by FabriCreator"><source src="/assets/axis-render.mp4" type="video/mp4">Your browser cannot play this video. <a href="/assets/axis-render.mp4">Watch the rendering test.</a></video>
-                <button class="film-toggle" type="button" aria-controls="axis-video" aria-pressed="false" hidden><span class="play-symbol" aria-hidden="true">▶</span><span class="film-label">Play render</span></button>
+                <video id="axis-video" class="axis-video" controls autoplay playsinline muted loop preload="none" poster="/assets/axis-render.png" aria-label="Rendering test of the robotic arm designed by FabriCreator"><source src="/assets/axis-render.mp4" type="video/mp4">Your browser cannot play this video. <a href="/assets/axis-render.mp4">Watch the rendering test.</a></video>
               </div>
-              <div class="render-scrub" hidden><label for="arm-range" class="mono">Scrub the render</label><input id="arm-range" type="range" min="0" max="100" value="0" aria-label="Robotic arm rendering playback position"></div>
               <figcaption>Arm design by <a href="https://fabricreator.com/en" target="_blank" rel="noopener noreferrer">FabriCreator ↗</a><span>Rendering test by LaunchAxis.</span></figcaption>
             </figure>
           </div>
         </article>
         <article class="project tide" id="tide" data-category="film" aria-labelledby="tide-title">
           <div class="project-top"><span class="mono">03 / ANIMATION &amp; FILM</span><span class="status"><span aria-hidden="true"></span> In development</span></div>
-          <div class="tide-prelude"><p class="eyebrow">A change of perspective.</p><h2>From a single line.<br>To an entire <em>world.</em></h2><p>Scroll into Tide — a short film taking shape in Blender.</p></div>
-          <div class="tide-story" aria-label="Tide: from a line to a living scene">
+          <div class="tide-prelude"><p class="eyebrow">A change of perspective.</p><h2>From scattered points.<br>To an entire <em>world.</em></h2><p>Scroll into Tide — a short film taking shape in Blender.</p></div>
+          <div class="tide-story" aria-label="Tide: from vertices to a living scene">
             <div class="tide-stage">
               <div class="tide-screen tide-cinema">
-            <video id="tide-video" class="tide-video" controls playsinline muted loop preload="none" poster="/assets/tide-poster.jpg" aria-label="Tide work-in-progress sample: a wooden boat floating on water"><source src="/assets/tide-scene.mp4" type="video/mp4">Your browser cannot play this video. <a href="/assets/tide-scene.mp4">Watch the Tide sample.</a></video>
+            <video id="tide-video" class="tide-video" controls autoplay playsinline muted loop preload="none" poster="/assets/tide-poster.jpg" aria-label="Tide work-in-progress sample: a wooden boat floating on water"><source src="/assets/tide-scene.mp4" type="video/mp4">Your browser cannot play this video. <a href="/assets/tide-scene.mp4">Watch the Tide sample.</a></video>
             <div class="tide-3d" aria-hidden="true"></div>
             <div class="cinema-shade" aria-hidden="true"></div><div class="cinema-top mono"><span>BLENDER / WORK-IN-PROGRESS SCENE</span><span>00:08</span></div><h3 id="tide-title" class="tide-title">Tide</h3>
-            <button class="film-toggle" type="button" aria-controls="tide-video" aria-pressed="false" hidden><span class="play-symbol" aria-hidden="true">▶</span><span class="film-label">Play scene</span></button>
               </div>
               <div class="tide-story-ui" hidden>
                 <div class="story-topline"><span class="mono">LA / A SCENE IN THE MAKING</span><a href="#tide-details" class="story-skip">Skip animation ↓</a></div>
-                <div class="story-heading"><p class="mono story-kicker">01 — FORM</p><p class="story-statement">Every scene<br>starts with a line.</p></div>
-                <div class="story-bottom"><span class="mono story-scroll-hint">Keep scrolling to build the scene ↓</span><nav class="story-steps" aria-label="Tide animation stages"><button type="button" data-story-step="0.2" aria-current="step"><span>01</span> Form</button><button type="button" data-story-step="0.5"><span>02</span> Material</button><button type="button" data-story-step="0.91"><span>03</span> Scene</button></nav></div>
+                <div class="story-heading"><p class="mono story-kicker">01 — VERTICES</p><p class="story-statement">A thousand directions.<br>One possibility.</p></div>
+                <div class="story-bottom"><span class="mono story-scroll-hint">Scroll to bring it together ↓</span><nav class="story-steps" aria-label="Tide animation stages"><button type="button" data-story-step="0.17" aria-current="step"><span>01</span> Vertices</button><button type="button" data-story-step="0.56"><span>02</span> Form</button><button type="button" data-story-step="0.91"><span>03</span> Scene</button></nav></div>
                 <div class="story-progress" aria-hidden="true"><i></i></div>
               </div>
             </div>

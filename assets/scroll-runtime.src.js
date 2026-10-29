@@ -36,13 +36,24 @@ export function canvasRenderer(){
   scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);
   ctx.setTransform(ratio,0,0,ratio,0,0);ctx.clearRect(0,0,width,height);ctx.lineWidth=.7;
   scene.traverse(object=>{
-   if(!object.visible||!object.isLineSegments)return;
+   if(!object.visible||(!object.isLineSegments&&!object.isPoints))return;
    const geometry=object.geometry,position=geometry.attributes.position,indices=geometry.index;
    const material=object.material,uniforms=material.uniforms;
    const opacity=uniforms?.uOpacity?.value??material.opacity;if(opacity<.001)return;
    const source=geometry.attributes.aStart,seed=geometry.attributes.aSeed;
    projector.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse).multiply(object.matrixWorld);
    const count=indices?indices.count:position.count;
+   if(object.isPoints){
+    ctx.fillStyle='#d7ebaf';ctx.globalAlpha=opacity;
+    for(let n=0;n<position.count;n++){
+     a.fromBufferAttribute(position,n);
+     const s=seed?.getX(n)??.5;
+     if(source){const t=smooth(0,1,clamp((uniforms.uAssembly.value-s*.19)/.81));start.fromBufferAttribute(source,n);a.lerpVectors(start,a,t);const arc=Math.sin(t*Math.PI)*(1-t)*uniforms.uSize.value*.3;a.x+=Math.cos(s*31.4)*arc;a.y+=Math.sin(s*25.1)*arc;a.z+=Math.cos(s*18.7)*arc;}
+     a.applyMatrix4(projector);if(!inView(a)||Math.abs(a.x)>1.05||Math.abs(a.y)>1.05)continue;
+     const dot=(uniforms?.uPointSize?.value??1.6)*(.75+s*.5);
+     ctx.fillRect((a.x*.5+.5)*width-dot/2,(-a.y*.5+.5)*height-dot/2,dot,dot);
+    }return;
+   }
    ctx.globalAlpha=opacity;ctx.strokeStyle=uniforms?'#b9d194':`#${material.color.getHexString()}`;ctx.beginPath();
    for(let i=0;i<count-1;i+=2){
     for(let j=0;j<2;j++){
@@ -65,7 +76,7 @@ function notice(target,text){const p=document.createElement('p');p.className='sc
 
 async function tide(){
  const story=document.querySelector('.tide-story');if(!story)return;
- const host=story.querySelector('.tide-3d'),screen=story.querySelector('.tide-screen'),stage=story.querySelector('.tide-stage'),video=story.querySelector('video'),ui=story.querySelector('.tide-story-ui'),play=story.querySelector('.film-toggle');
+ const host=story.querySelector('.tide-3d'),screen=story.querySelector('.tide-screen'),stage=story.querySelector('.tide-stage'),video=story.querySelector('video'),ui=story.querySelector('.tide-story-ui');
  let renderer;
  try{
   const gltf=await loader.loadAsync('/assets/models/tide.glb');
@@ -84,51 +95,37 @@ async function tide(){
   // A continuous arc avoids the old stop/start halfway around the boat.
   const cameraPath=new THREE.CatmullRomCurve3([startPosition,turnPosition,endPosition],false,'centripetal');
   const focal=center.clone();
-  const materials=[];
-  craft.traverse(o=>{if(o.isMesh){o.frustumCulled=false;const ms=Array.isArray(o.material)?o.material:[o.material];for(const mat of ms){mat.transparent=true;mat.opacity=0;mat.depthWrite=true;mat.side=THREE.DoubleSide;materials.push(mat);}}});
-
-  // Use edges from the supplied boat itself, with a stable scatter-to-mesh trajectory.
-  const target=[],starts=[],seeds=[];let segment=0;
+  // Use the actual mesh vertices, welding UV/normal duplicates into single dots.
+  // The solid mesh is not part of this particle-to-footage transition.
+  const target=[],starts=[],seeds=[],seen=new Set();let vertex=0;
   craft.traverse(o=>{
    if(!o.isMesh)return;
-   const wire=new THREE.WireframeGeometry(o.geometry),pos=wire.getAttribute('position');
-   const segmentBudget=matchMedia('(max-width: 600px)').matches?4200:6800;
-   const stride=Math.max(1,Math.ceil(pos.count/2/segmentBudget));
-   for(let i=0;i<pos.count-1;i+=2*stride){
-    const hash=(Math.sin(segment*127.1+31.7)*43758.5453)%1;const h=hash-Math.floor(hash);
-    for(let j=0;j<2;j++){
-     const p=vec().fromBufferAttribute(pos,i+j).applyMatrix4(o.matrixWorld);
-     target.push(p.x,p.y,p.z);
-     const side=segment%2?1:-1;
-     const near=segment%9===0?.22:1;
-     starts.push(center.x+side*length*(1.1+h*2.2)*near+(j?.18:0),center.y+(h-.5)*length*2.5,center.z+(h-.5)*length*2);
-     seeds.push(h);
-    }segment++;
-   }wire.dispose();
+   const pos=o.geometry.getAttribute('position');o.visible=false;
+   for(let i=0;i<pos.count;i++){
+    const p=vec().fromBufferAttribute(pos,i).applyMatrix4(o.matrixWorld),key=[p.x,p.y,p.z].map(n=>Math.round(n*10000)).join(',');
+    if(seen.has(key))continue;seen.add(key);
+    const hash=Math.sin(vertex*127.1+31.7)*43758.5453,h=hash-Math.floor(hash),h2=(vertex*.61803398875)%1,z=2*h2-1,angle=vertex*2.39996323,r=length*(.8+h*1.9),ring=Math.sqrt(1-z*z);
+    target.push(p.x,p.y,p.z);starts.push(center.x+Math.cos(angle)*ring*r,center.y+z*r,center.z+Math.sin(angle)*ring*r);seeds.push(h);vertex++;
+   }
   });
-  const lineGeometry=new THREE.BufferGeometry();
-  lineGeometry.setAttribute('position',new THREE.Float32BufferAttribute(target,3));
-  lineGeometry.setAttribute('aStart',new THREE.Float32BufferAttribute(starts,3));
-  lineGeometry.setAttribute('aSeed',new THREE.Float32BufferAttribute(seeds,1));
-  const lineMaterial=new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{uAssembly:{value:0},uOpacity:{value:.7},uSize:{value:length}},vertexShader:`
-   attribute vec3 aStart;attribute float aSeed;uniform float uAssembly;uniform float uSize;varying float vSeed;
-   void main(){float t=clamp((uAssembly-aSeed*.15)/.85,0.,1.);t=t*t*(3.-2.*t);vec3 p=mix(aStart,position,t);p.y+=sin(t*3.14159265)*(aSeed-.5)*uSize*.8;vSeed=aSeed;gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}
-  `,fragmentShader:`uniform float uOpacity;varying float vSeed;void main(){vec3 c=mix(vec3(.69,.78,.62),vec3(.85,.99,.35),step(.88,vSeed));gl_FragColor=vec4(c,uOpacity*(.4+.6*vSeed));}`});
-  const lines=new THREE.LineSegments(lineGeometry,lineMaterial);lines.frustumCulled=false;scene.add(lines);
-  const grid=new THREE.GridHelper(length*7,40,0x839a56,0x435137);grid.position.copy(center);grid.position.y=box.min.y+.08;
-  grid.material.transparent=true;grid.material.opacity=0;scene.add(grid);
-  // A small point field adds depth without substituting fabricated project content.
-  const pointPositions=[];for(let i=0;i<96;i++){const a=i*2.39996;pointPositions.push(center.x+Math.cos(a)*length*(1+(i%7)/3),center.y+(i%9-4)*length*.13,center.z+Math.sin(a)*length*2);}
-  const pointsGeometry=new THREE.BufferGeometry().setAttribute('position',new THREE.Float32BufferAttribute(pointPositions,3));
-  const points=new THREE.Points(pointsGeometry,new THREE.PointsMaterial({color:0xc3da9c,size:.024,transparent:true,opacity:.4}));scene.add(points);
+  const particleGeometry=new THREE.BufferGeometry();
+  particleGeometry.setAttribute('position',new THREE.Float32BufferAttribute(target,3));
+  particleGeometry.setAttribute('aStart',new THREE.Float32BufferAttribute(starts,3));
+  particleGeometry.setAttribute('aSeed',new THREE.Float32BufferAttribute(seeds,1));
+  const particleMaterial=new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{uAssembly:{value:0},uOpacity:{value:.8},uSize:{value:length},uPointSize:{value:1.5},uDpr:{value:Math.min(devicePixelRatio||1,1.6)}},vertexShader:`
+   attribute vec3 aStart;attribute float aSeed;uniform float uAssembly;uniform float uSize;uniform float uPointSize;uniform float uDpr;varying float vSeed;
+   void main(){float t=clamp((uAssembly-aSeed*.19)/.81,0.,1.);t=t*t*(3.-2.*t);vec3 p=mix(aStart,position,t);float arc=sin(t*3.14159265)*(1.-t)*uSize*.3;p+=vec3(cos(aSeed*31.4),sin(aSeed*25.1),cos(aSeed*18.7))*arc;vSeed=aSeed;gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);gl_PointSize=uPointSize*uDpr*(.75+aSeed*.5);}
+  `,fragmentShader:`uniform float uOpacity;varying float vSeed;void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;vec3 c=mix(vec3(.72,.83,.62),vec3(.94,.99,.84),vSeed);gl_FragColor=vec4(c,uOpacity*(1.-smoothstep(.3,.5,d)));}`});
+  const particles=new THREE.Points(particleGeometry,particleMaterial);particles.frustumCulled=false;scene.add(particles);
+  host.dataset.vertices=String(vertex);
+  const registration=new THREE.Matrix4();
   let failed=false,lastPhase=-1,last=-1,progress=0,width=0,height=0;
   const label=story.querySelector('.story-kicker'),statement=story.querySelector('.story-statement'),buttons=[...story.querySelectorAll('[data-story-step]')];
   const uiControls=[...ui.querySelectorAll('button,a')];
-  const stateCopy=[['01 — FORM','Every scene<br>starts with a line.'],['02 — MATERIAL','An idea.<br>Given a form.'],['03 — ATMOSPHERE','And then,<br>a world.']];
-  if(renderer.isCanvasFallback)buttons[1].lastChild.textContent=' Perspective';
-  video.dataset.storyManaged='true';video.pause();
+  const stateCopy=[['01 — VERTICES','A thousand directions.<br>One possibility.'],['02 — FORM','Every point.<br>Finding its place.'],['03 — ATMOSPHERE','And then,<br>a world.']];
+  video.dataset.storyManaged='true';video.autoplay=false;video.pause();
   // End on the source Blender camera. Verify the shot match in browser QA.
-  video.preload='auto';video.load();
+  video.preload='auto';video.addEventListener('loadeddata',schedule,{once:true});video.load();
   story.classList.add('story-ready');ui.hidden=false;
   function resize(){
    const toolbar=document.querySelector('.work-toolbar'),header=document.querySelector('.header');
@@ -142,12 +139,12 @@ async function tide(){
    const start=story.getBoundingClientRect().top+scrollY-top;
    window.scrollTo({top:start+(story.offsetHeight-stage.offsetHeight)*Number(button.dataset.storyStep),behavior:active()?'smooth':'instant'});
   }));
-  function fallback(){failed=true;story.classList.remove('story-ready','story-static');ui.hidden=true;ui.inert=false;play.tabIndex=0;video.dataset.storyManaged='false';renderer.dispose();host.replaceChildren();ro.disconnect();notice(story,'The 3D view is unavailable on this device. The original Tide scene is shown instead.');}
+  function fallback(){failed=true;story.classList.remove('story-ready','story-static');ui.hidden=true;ui.inert=false;video.dataset.storyManaged='false';renderer.dispose();host.replaceChildren();ro.disconnect();video.play().catch(()=>{video.controls=true;});notice(story,'The 3D view is unavailable on this device. The original Tide scene is shown instead.');}
   renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();fallback();},{once:true});
   jobs.push(()=>{
    if(failed)return false;
    const enabled=active();story.classList.toggle('story-static',!enabled);
-   if(!enabled){if(!video.paused)video.pause();play.tabIndex=0;ui.inert=true;last=-1;return false;}
+   if(!enabled){ui.inert=true;last=-1;return false;}
    if(!story.getClientRects().length){video.pause();last=-1;return false;}
    const rect=story.getBoundingClientRect(),top=parseFloat(getComputedStyle(story).getPropertyValue('--story-top'))||149;
    const desired=clamp((top-rect.top)/Math.max(1,story.offsetHeight-stage.offsetHeight));
@@ -155,14 +152,11 @@ async function tide(){
    if(!visible){video.pause();last=-1;return false;}
    progress=last<0?desired:THREE.MathUtils.lerp(progress,desired,frameBlend);
    if(Math.abs(progress-desired)<.00015)progress=desired;
-   if(progress===last){if(progress>.84&&video.dataset.manuallyPaused!=='true'&&video.paused)video.play().catch(()=>{});return false;}last=progress;
-   const p=progress,assembly=smooth(0,.28,p),material=smooth(.28,.51,p),turn=smooth(.25,.67,p),reveal=smooth(.69,.84,p),dock=smooth(.87,1,p);
-   lineMaterial.uniforms.uAssembly.value=assembly;
-   lineMaterial.uniforms.uOpacity.value=renderer.isCanvasFallback?(1-smooth(.69,.84,p))*.55:(1-smooth(.35,.61,p))*.82;
-   // The canvas layer handles the footage crossfade; do not fade the hull twice.
-   for(const mat of materials)mat.opacity=material;
-   grid.material.opacity=smooth(.1,.3,p)*(1-reveal)*.22;
-   points.material.opacity=(1-smooth(.35,.65,p))*.4;
+   if(progress===last){if(progress>.88&&video.paused)video.play().catch(()=>{video.controls=true;});return false;}last=progress;
+   const p=progress,assembly=smooth(.01,.43,p),turn=smooth(.32,.69,p),reveal=smooth(.76,.88,p),dock=smooth(.92,1,p);
+   particleMaterial.uniforms.uAssembly.value=assembly;
+   particleMaterial.uniforms.uOpacity.value=.5+assembly*.28;
+   particleMaterial.uniforms.uPointSize.value=THREE.MathUtils.lerp(2,1.35,assembly);
    camera.position.copy(cameraPath.getPointAt(turn));
    // Portrait screens need a wider orbit; blend back into the render framing
    // only for the final handover, where the footage itself is cover-cropped.
@@ -174,26 +168,32 @@ async function tide(){
    camera.quaternion.slerp(endQuaternion,smooth(.92,1,turn));
    const endFov=THREE.MathUtils.radToDeg(2*Math.atan(Math.tan(THREE.MathUtils.degToRad(nativeFov)/2)*Math.min(1,nativeAspect/camera.aspect)));
    camera.fov=THREE.MathUtils.lerp(camera.aspect<1?57:40,endFov,smooth(.15,1,turn));camera.updateProjectionMatrix();
+   // Film-plane registration measured from bow/stern landmarks in the actual
+   // supplied clip's first frame (1280 x 600), not the separately saved .blend.
+   // Apply in native film coordinates, conjugated by the video's cover crop.
+   const aligned=smooth(.72,1,turn),sx=Math.max(1,nativeAspect/camera.aspect),sy=Math.max(1,camera.aspect/nativeAspect);
+   const ax=.9172105806,bx=.1055532892,cx=-.1816644784,ay=-.1401659871,by=.7990381312,cy=.2757068068;
+   registration.set(1+(ax-1)*aligned,bx*sx/sy*aligned,0,cx*sx*aligned,ay*sy/sx*aligned,1+(by-1)*aligned,0,cy*sy*aligned,0,0,1,0,0,0,0,1);
+   camera.projectionMatrix.premultiply(registration);camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
    renderer.render(scene,camera);
-   const phase=p<.31?0:p<.64?1:2;
-   if(phase!==lastPhase){lastPhase=phase;label.textContent=renderer.isCanvasFallback&&phase===1?'02 — PERSPECTIVE':stateCopy[phase][0];statement.innerHTML=stateCopy[phase][1];buttons.forEach((b,i)=>{if(i===phase)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});}
+   const phase=p<.39?0:p<.72?1:2;
+   if(phase!==lastPhase){lastPhase=phase;label.textContent=stateCopy[phase][0];statement.innerHTML=stateCopy[phase][1];buttons.forEach((b,i)=>{if(i===phase)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});}
    story.style.setProperty('--scene-reveal',reveal.toFixed(4));
    story.style.setProperty('--model-opacity',(1-reveal).toFixed(4));
-   story.style.setProperty('--heading-opacity',(1-smooth(.65,.75,p)).toFixed(4));
-   story.style.setProperty('--ui-opacity',(1-smooth(.78,.88,p)).toFixed(4));
+   story.style.setProperty('--heading-opacity',(1-smooth(.68,.76,p)).toFixed(4));
+   story.style.setProperty('--ui-opacity',(1-smooth(.84,.91,p)).toFixed(4));
    story.style.setProperty('--story-scale',(1-dock*.075).toFixed(4));
    story.style.setProperty('--story-progress',p.toFixed(4));
    story.style.setProperty('--video-events',p>.83?'auto':'none');
-   ui.inert=p>.88;
-   uiControls.forEach(el=>el.tabIndex=p>.88?-1:0);
-   play.tabIndex=p>.83?0:-1;
-   if(p>.84&&video.dataset.manuallyPaused!=='true'&&!document.hidden){if(video.paused)video.play().catch(()=>{});}
-   else if(p<=.84){video.pause();if(video.readyState>0&&video.currentTime>.04)video.currentTime=0;}
+   ui.inert=p>.91;
+   uiControls.forEach(el=>el.tabIndex=p>.91?-1:0);
+   if(p>.88&&!document.hidden){if(video.paused)video.play().catch(()=>{video.controls=true;});}
+   else {video.pause();if(video.readyState>0&&video.currentTime>.01)video.currentTime=0;}
    return Math.abs(progress-desired)>.00015;
   });
   schedule();
  }catch(error){
-  if(renderer)renderer.dispose();story.classList.remove('story-ready','story-static');ui.hidden=true;ui.inert=false;play.tabIndex=0;video.dataset.storyManaged='false';host.replaceChildren();
+  if(renderer)renderer.dispose();story.classList.remove('story-ready','story-static');ui.hidden=true;ui.inert=false;video.dataset.storyManaged='false';host.replaceChildren();video.play().catch(()=>{video.controls=true;});
   console.warn('Tide 3D enhancement unavailable:',error.message);
  }
 }

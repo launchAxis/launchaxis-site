@@ -4,10 +4,8 @@
   const root = document.documentElement;
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
   const saveData = Boolean(navigator.connection && navigator.connection.saveData);
-  const motionButton = document.querySelector('.motion-toggle');
-  let preference = null;
-  try { preference = localStorage.getItem('launchaxis-motion'); } catch (_) { /* Storage is optional. */ }
-  let motion = preference === 'off' ? false : !reduce.matches;
+  // No site-wide toggle or persistent off-state. Honor device accessibility settings.
+  let motion = !reduce.matches;
   let raf = 0, time = 0, lastFrame = 0;
   let scrollFraction = 0, pointerX = 0, pointerY = 0;
   const drawables = [];
@@ -49,54 +47,30 @@
     document.querySelectorAll('[data-reveal]').forEach(el => reveal.observe(el));
   }
 
-  // Custom controls replace native controls only after their handlers exist.
+  // Muted inline loops play automatically on entry. Native controls appear only
+  // when autoplay is blocked or the device requests reduced motion/data usage.
+  function playVisible(video){
+    if(video.dataset.storyManaged==='true'||document.hidden)return;
+    if(!motion||saveData){video.pause();video.controls=true;return;}
+    video.play().catch(()=>{video.controls=true;});
+  }
   videos.forEach(video => {
-    const button = document.querySelector(`[aria-controls="${video.id}"]`);
     const wrapper = video.parentElement;
-    const state = { visible: false, manuallyPaused: false, tried: false };
+    const state = { visible: false, tried: false };
     videoState.set(video, state);
-    const sync = () => {
-      const playing = !video.paused;
-      button.setAttribute('aria-pressed', String(playing));
-      button.querySelector('.play-symbol').textContent = playing ? 'Ⅱ' : '▶';
-      button.querySelector('.film-label').textContent = playing ? 'Pause' : (video.id === 'tide-video' ? 'Play scene' : 'Play render');
-      wrapper.classList.toggle('is-playing', playing);
-    };
-    button.addEventListener('click', async () => {
-      if (video.paused) {
-        state.manuallyPaused = false;
-        video.dataset.manuallyPaused = 'false';
-        try { await video.play(); } catch (_) { video.controls = true; button.hidden = true; }
-      } else { state.manuallyPaused = true; video.dataset.manuallyPaused = 'true'; video.pause(); }
-    });
+    const sync = () => wrapper.classList.toggle('is-playing',!video.paused);
     video.addEventListener('play', sync);
     video.addEventListener('pause', sync);
     video.addEventListener('error', () => {
-      button.hidden = true;
       video.controls = true;
       const notice = document.createElement('p');
       notice.className = 'video-error';
       notice.textContent = 'Video unavailable. The still image is shown above.';
       wrapper.after(notice);
     }, { once: true });
-    video.controls = false;
-    button.hidden = false;
-  });
-  const scrub = document.querySelector('#arm-range');
-  const arm = document.querySelector('#axis-video');
-  arm.addEventListener('loadedmetadata', () => { document.querySelector('.render-scrub').hidden = false; });
-  scrub.addEventListener('input', () => {
-    if (!Number.isFinite(arm.duration)) return;
-    videoState.get(arm).manuallyPaused = true;
-    arm.pause();
-    arm.currentTime = Number(scrub.value) / 100 * Math.max(0, arm.duration - 0.03);
-    scrub.setAttribute('aria-valuetext', `${arm.currentTime.toFixed(1)} seconds`);
-  });
-  arm.addEventListener('timeupdate', () => {
-    if (Number.isFinite(arm.duration)) {
-      scrub.value = String(arm.currentTime / arm.duration * 100);
-      scrub.setAttribute('aria-valuetext', `${arm.currentTime.toFixed(1)} of ${arm.duration.toFixed(1)} seconds`);
-    }
+    video.muted=true;video.loop=true;video.playsInline=true;
+    video.controls = !motion||saveData;
+    if(!motion||saveData)video.pause();
   });
   if (hasObserver) {
     const videoObserver = new IntersectionObserver(entries => entries.forEach(entry => {
@@ -104,7 +78,7 @@
       state.visible = entry.isIntersecting;
       if (!entry.isIntersecting) { video.pause(); return; }
       if (!state.tried && !saveData) { video.preload = 'metadata'; video.load(); state.tried = true; }
-      if (motion && !saveData && !state.manuallyPaused && !document.hidden && video.dataset.storyManaged !== 'true') video.play().catch(() => {});
+      playVisible(video);
     }), { threshold: 0.45 });
     videos.forEach(video => videoObserver.observe(video));
   }
@@ -213,23 +187,17 @@
     if(drawables.some(x=>x.visible))raf=requestAnimationFrame(tick);
   }
   function startAnimation(){if(motion&&!document.hidden&&!raf&&drawables.some(x=>x.visible)){lastFrame=performance.now();raf=requestAnimationFrame(tick);}}
-  function setMotion(enabled,persist=false){
+  function setMotion(enabled){
     motion=enabled;root.classList.toggle('motion-paused',!motion);
-    motionButton.setAttribute('aria-pressed',String(!motion));
-    motionButton.querySelector('.motion-label').textContent=motion?'Pause motion':'Enable motion';
-    motionButton.querySelector('.motion-glyph').textContent=motion?'Ⅱ':'▶';
-    motionButton.setAttribute('aria-label',motion?'Pause animations and videos':'Enable animations and video previews');
-    if(persist){try{localStorage.setItem('launchaxis-motion',motion?'on':'off');}catch(_){}}
+    videos.forEach(v=>v.controls=!motion||saveData);
     if(!motion){cancelAnimationFrame(raf);raf=0;videos.forEach(v=>v.pause());root.style.setProperty('--title-drift','0px');}
-    else{startAnimation();videos.forEach(v=>{const s=videoState.get(v);if(s.visible&&!s.manuallyPaused&&!saveData&&v.dataset.storyManaged!=='true')v.play().catch(()=>{});});}
+    else{startAnimation();videos.forEach(v=>{if(videoState.get(v).visible)playVisible(v);});}
     drawStill();
   }
-  motionButton.addEventListener('click',()=>setMotion(!motion,true));
-  motionButton.hidden=false;
   reduce.addEventListener('change',e=>setMotion(!e.matches));
   document.addEventListener('visibilitychange',()=>{
     if(document.hidden){cancelAnimationFrame(raf);raf=0;videos.forEach(v=>v.pause());}
-    else{startAnimation();videos.forEach(v=>{const s=videoState.get(v);if(motion&&s.visible&&!s.manuallyPaused&&!saveData&&v.dataset.storyManaged!=='true')v.play().catch(()=>{});});}
+    else{startAnimation();videos.forEach(v=>{if(videoState.get(v).visible)playVisible(v);});}
   });
 
   let scrollScheduled=false;

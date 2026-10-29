@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#111310">
+  <meta name="theme-color" content="#f5f5ef">
   <title>LaunchAxis — Ideas into motion.</title>
   <meta name="description" content="An independent project studio exploring AI, robotics and film. Meet Aventis, Axis and Tide. Different disciplines. The same curiosity.">
   <link rel="canonical" href="https://launchaxis.net/">
@@ -21,8 +21,10 @@
   <link rel="stylesheet" href="/assets/site.css">
   <link rel="stylesheet" href="/assets/render.css">
   <link rel="stylesheet" href="/assets/scroll-scenes.css">
+  <link rel="stylesheet" href="/assets/editorial.css">
   <script src="/assets/site.js" defer></script>
   <script type="module" src="/assets/scroll-scenes.js"></script>
+  <script src="/assets/editorial.js" defer></script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"LaunchAxis","url":"https://launchaxis.net/"}</script>
 </head>
 <body id="top">
@@ -39,27 +41,33 @@
   </header>
   <main id="main">
     <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-stage">
       <div class="hero-grid" aria-hidden="true"></div>
+      <div class="hero-media" aria-hidden="true"><img src="/assets/tide-poster.jpg" alt="" width="1920" height="900" fetchpriority="high"><span class="hero-image-caption mono">TIDE / A WORLD IN THE MAKING</span></div>
+      <div class="hero-satellite satellite-arm" aria-hidden="true"><img src="/assets/axis-render.png" alt="" width="1920" height="1080"></div>
+      <div class="hero-satellite satellite-ai" aria-hidden="true"><img src="/assets/aventis-logo.png" alt="" width="2048" height="853"><span class="mono">INTELLIGENCE, EXPLORED.</span></div>
       <div class="shell hero-content">
         <p class="eyebrow"><span class="signal" aria-hidden="true"></span> An independent project studio</p>
-        <h1 id="hero-title"><span>Ideas into</span><span class="hero-last">motion<span class="lime">.</span></span></h1>
-        <div class="hero-bottom-copy"><p>Intelligence. Engineering. Imagination.<br>Different ways to ask <em>what if.</em></p><a class="round-link" href="#projects"><span>Explore the work</span><span class="round-arrow" aria-hidden="true">↓</span></a></div>
+        <h1 id="hero-title"><span>Ideas worth</span><span class="hero-last">bringing to <em>life.</em></span></h1>
+        <div class="hero-bottom-copy"><p>Intelligence. Engineering. Imagination.</p><a class="round-link" href="#projects"><span>Explore the work</span><span class="round-arrow" aria-hidden="true">↓</span></a></div>
       </div>
       <div class="hero-sculpture" aria-hidden="true"><canvas id="axis-core"></canvas><div class="core-fallback"><i></i><i></i><i></i></div><span class="core-label">LA — EXPLORATION / 001</span><span class="core-coordinate">FORM IN MOTION</span></div>
       <div class="shell hero-bottom"><span class="mono">Built on curiosity. Always in progress.</span><span class="mono scroll-hint">Scroll to explore <span aria-hidden="true">↓</span></span></div>
+      </div>
     </section>
+    <section class="manifesto" aria-labelledby="manifesto-title"><div class="shell"><p class="eyebrow">A place for the what if.</p><h2 id="manifesto-title" class="reading-statement">An idea is only the beginning. Make it think. Make it move. Make it mean something.</h2><div class="manifesto-bottom"><span class="manifesto-mark" aria-hidden="true">↗</span><p>LaunchAxis brings technical experiments and creative work into one place. Three projects. Different disciplines. The same drive to find out what comes next.</p></div></div></section>
     <div class="discipline-strip" aria-label="Explore by discipline"><div class="shell discipline-links"><a href="#aventis"><span class="mono">01 /</span> Intelligence <span aria-hidden="true">↗</span></a><a href="#axis"><span class="mono">02 /</span> Motion <span aria-hidden="true">↗</span></a><a href="#tide"><span class="mono">03 /</span> Imagination <span aria-hidden="true">↗</span></a></div></div>
 
     <section class="work-section" id="projects" aria-labelledby="work-title">
-      <div class="shell work-heading"><div><p class="eyebrow">01 — Selected explorations</p><h2 class="display" id="work-title" data-reveal>Three worlds.<br><span class="dim">One curiosity.</span></h2></div><div class="work-intro"><p>Not one lane.<br>A place to build across them.</p><p class="muted">Ongoing experiments in how we think, how things move, and how stories feel.</p></div></div>
+      <div class="shell work-heading"><div><p class="eyebrow">01 — Selected explorations</p><h2 class="display" id="work-title" data-reveal>One curiosity.<br><span class="dim">Many possibilities.</span></h2></div><div class="work-intro"><p>From a first question<br>to something you can see.</p><p class="muted">Explore the projects in progress.</p></div></div>
       <div class="work-toolbar"><div class="shell toolbar-inner"><nav class="project-nav" aria-label="Project shortcuts"><a href="#aventis" data-project-link="aventis"><span>01</span> Aventis</a><a href="#axis" data-project-link="axis"><span>02</span> Axis</a><a href="#tide" data-project-link="tide"><span>03</span> Tide</a></nav><div class="filters" role="group" aria-label="Filter projects" hidden><button type="button" data-filter="all" aria-pressed="true">All</button><button type="button" data-filter="ai" aria-pressed="false">AI</button><button type="button" data-filter="robotics" aria-pressed="false">Robotics</button><button type="button" data-filter="film" aria-pressed="false">Film</button></div></div></div>
       <p class="sr-only" id="filter-status" role="status"></p>
       <div class="shell project-list">
         <article class="project aventis" id="aventis" data-category="ai" aria-labelledby="aventis-title">
           <div class="project-top"><span class="mono">01 / ARTIFICIAL INTELLIGENCE</span><span class="status"><span aria-hidden="true"></span> In development</span></div>
           <div class="project-layout">
-            <div class="project-copy"><h3 id="aventis-title" class="project-name" data-reveal>Aventis<span class="lime">.</span></h3><h4>Intelligence,<br>in conversation.</h4><p>What happens when AI models work together? Aventis explores cooperation between models—and the questions that emerge along the way.</p><div class="tags"><span>AI</span><span>Cooperation</span><span>Exploration</span></div><details><summary>Inside the project <span aria-hidden="true">+</span></summary><div><p>An independent AI development project, previously called Synapse. Technical details and results are not being published here at this stage.</p><p class="muted">The visual alongside is an abstract illustration of connection, not a model architecture or live system.</p></div></details></div>
-            <div class="project-visual network-visual" data-reveal><div class="visual-label mono"><span>CONNECTION STUDY</span><span>001</span></div><canvas id="network-canvas" aria-hidden="true"></canvas><div class="network-fallback" aria-hidden="true"><i></i><i></i><i></i><b></b></div><svg class="aventis-brand" xmlns="http://www.w3.org/2000/svg" viewBox="650 265 750 295" aria-label="Aventis logo" role="img"><image href="/assets/aventis-logo.png" width="2048" height="853"/></svg><p class="visual-foot mono">Multiple perspectives. A shared question.</p></div>
+            <div class="project-copy"><h3 id="aventis-title" class="project-name" data-reveal>Aventis<span class="lime">.</span></h3><h4>A question<br>of intelligence.</h4><p>An independent AI/ACI project. A space to explore ideas in artificial intelligence, develop them, and keep asking what comes next.</p><div class="tags"><span>AI / ACI</span><span>Development</span><span>Exploration</span></div><details><summary>Inside the project <span aria-hidden="true">+</span></summary><div><p>Previously called Synapse. Technical details and results are not being published here at this stage.</p><p class="muted">The visual alongside is an abstract illustration of connection, not a model architecture or live system.</p></div></details></div>
+            <div class="project-visual network-visual" data-reveal><div class="visual-label mono"><span>CONNECTION STUDY</span><span>001</span></div><canvas id="network-canvas" aria-hidden="true"></canvas><div class="network-fallback" aria-hidden="true"><i></i><i></i><i></i><b></b></div><svg class="aventis-brand" xmlns="http://www.w3.org/2000/svg" viewBox="650 265 750 295" aria-label="Aventis logo" role="img"><image href="/assets/aventis-logo.png" width="2048" height="853"/></svg><p class="visual-foot mono">An exploration. Still unfolding.</p></div>
           </div>
         </article>
         <article class="project axis" id="axis" data-category="robotics" aria-labelledby="axis-title">
@@ -86,6 +94,7 @@
         </article>
         <article class="project tide" id="tide" data-category="film" aria-labelledby="tide-title">
           <div class="project-top"><span class="mono">03 / ANIMATION &amp; FILM</span><span class="status"><span aria-hidden="true"></span> In development</span></div>
+          <div class="tide-prelude"><p class="eyebrow">A change of perspective.</p><h2>From a single line.<br>To an entire <em>world.</em></h2><p>Scroll into Tide — a short film taking shape in Blender.</p></div>
           <div class="tide-story" aria-label="Tide: from a line to a living scene">
             <div class="tide-stage">
               <div class="tide-screen tide-cinema">

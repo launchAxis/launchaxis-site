@@ -6,12 +6,13 @@ import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 const smooth=(a,b,v)=>{const t=clamp((v-a)/(b-a));return t*t*(3-2*t);};
 const root=document.documentElement;
-const active=()=>!root.classList.contains('motion-paused')&&!matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reducedMotion=typeof matchMedia==='function'?matchMedia('(prefers-reduced-motion: reduce)'):null;
+const active=()=>!root.classList.contains('motion-paused')&&!reducedMotion?.matches;
 const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 const vec=()=>new THREE.Vector3();
-let jobs=[],scheduled=false;
+let jobs=[],scheduled=false,previousFrame=0,frameBlend=.2;
 function schedule(){if(!scheduled){scheduled=true;requestAnimationFrame(update);}}
-function update(){scheduled=false;if(document.hidden)return;let more=false;for(const job of jobs)more=job()||more;if(more)schedule();}
+function update(now){scheduled=false;if(document.hidden){previousFrame=0;return;}const delta=previousFrame&&now-previousFrame<120?Math.min(.05,(now-previousFrame)/1000):1/60;previousFrame=now;frameBlend=1-Math.exp(-13*delta);let more=false;for(const job of jobs)more=job()||more;if(more)schedule();}
 function rendererFor(host){
  const canvas=document.createElement('canvas');
  // Some managed browsers and low-power devices have no WebGL context at all.
@@ -63,7 +64,8 @@ function lightScene(scene){
 function notice(target,text){const p=document.createElement('p');p.className='scene-unavailable';p.textContent=text;target.after(p);}
 
 async function tide(){
- const story=document.querySelector('.tide-story'),host=story.querySelector('.tide-3d'),screen=story.querySelector('.tide-screen'),stage=story.querySelector('.tide-stage'),video=story.querySelector('video'),ui=story.querySelector('.tide-story-ui');
+ const story=document.querySelector('.tide-story');if(!story)return;
+ const host=story.querySelector('.tide-3d'),screen=story.querySelector('.tide-screen'),stage=story.querySelector('.tide-stage'),video=story.querySelector('video'),ui=story.querySelector('.tide-story-ui'),play=story.querySelector('.film-toggle');
  let renderer;
  try{
   const gltf=await loader.loadAsync('/assets/models/tide.glb');
@@ -79,6 +81,8 @@ async function tide(){
   const camera=new THREE.PerspectiveCamera(40,1,.05,1000);
   const startPosition=center.clone().add(new THREE.Vector3(length*.75,length*.85,length*1.65));
   const turnPosition=center.clone().add(new THREE.Vector3(-length*.7,length*.65,length*1.6));
+  // A continuous arc avoids the old stop/start halfway around the boat.
+  const cameraPath=new THREE.CatmullRomCurve3([startPosition,turnPosition,endPosition],false,'centripetal');
   const focal=center.clone();
   const materials=[];
   craft.traverse(o=>{if(o.isMesh){o.frustumCulled=false;const ms=Array.isArray(o.material)?o.material:[o.material];for(const mat of ms){mat.transparent=true;mat.opacity=0;mat.depthWrite=true;mat.side=THREE.DoubleSide;materials.push(mat);}}});
@@ -88,14 +92,16 @@ async function tide(){
   craft.traverse(o=>{
    if(!o.isMesh)return;
    const wire=new THREE.WireframeGeometry(o.geometry),pos=wire.getAttribute('position');
-   const stride=Math.max(1,Math.ceil(pos.count/2/8500));
+   const segmentBudget=matchMedia('(max-width: 600px)').matches?4200:6800;
+   const stride=Math.max(1,Math.ceil(pos.count/2/segmentBudget));
    for(let i=0;i<pos.count-1;i+=2*stride){
     const hash=(Math.sin(segment*127.1+31.7)*43758.5453)%1;const h=hash-Math.floor(hash);
     for(let j=0;j<2;j++){
      const p=vec().fromBufferAttribute(pos,i+j).applyMatrix4(o.matrixWorld);
      target.push(p.x,p.y,p.z);
      const side=segment%2?1:-1;
-     starts.push(center.x+side*length*(2.8+h*4)+(j?.3:0),center.y+(h-.5)*length*5,center.z+(h-.5)*length*4);
+     const near=segment%9===0?.22:1;
+     starts.push(center.x+side*length*(1.1+h*2.2)*near+(j?.18:0),center.y+(h-.5)*length*2.5,center.z+(h-.5)*length*2);
      seeds.push(h);
     }segment++;
    }wire.dispose();
@@ -117,6 +123,7 @@ async function tide(){
   const points=new THREE.Points(pointsGeometry,new THREE.PointsMaterial({color:0xc3da9c,size:.024,transparent:true,opacity:.4}));scene.add(points);
   let failed=false,lastPhase=-1,last=-1,progress=0,width=0,height=0;
   const label=story.querySelector('.story-kicker'),statement=story.querySelector('.story-statement'),buttons=[...story.querySelectorAll('[data-story-step]')];
+  const uiControls=[...ui.querySelectorAll('button,a')];
   const stateCopy=[['01 — FORM','Every scene<br>starts with a line.'],['02 — MATERIAL','An idea.<br>Given a form.'],['03 — ATMOSPHERE','And then,<br>a world.']];
   if(renderer.isCanvasFallback)buttons[1].lastChild.textContent=' Perspective';
   video.dataset.storyManaged='true';video.pause();
@@ -135,30 +142,36 @@ async function tide(){
    const start=story.getBoundingClientRect().top+scrollY-top;
    window.scrollTo({top:start+(story.offsetHeight-stage.offsetHeight)*Number(button.dataset.storyStep),behavior:active()?'smooth':'instant'});
   }));
-  function fallback(){failed=true;story.classList.remove('story-ready');ui.hidden=true;video.dataset.storyManaged='false';renderer.dispose();host.replaceChildren();ro.disconnect();notice(story,'The 3D view is unavailable on this device. The original Tide scene is shown instead.');}
+  function fallback(){failed=true;story.classList.remove('story-ready','story-static');ui.hidden=true;ui.inert=false;play.tabIndex=0;video.dataset.storyManaged='false';renderer.dispose();host.replaceChildren();ro.disconnect();notice(story,'The 3D view is unavailable on this device. The original Tide scene is shown instead.');}
   renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();fallback();},{once:true});
   jobs.push(()=>{
    if(failed)return false;
    const enabled=active();story.classList.toggle('story-static',!enabled);
-   if(!enabled){video.pause();last=-1;return false;}
-   if(!story.getClientRects().length){video.pause();return false;}
+   if(!enabled){if(!video.paused)video.pause();play.tabIndex=0;ui.inert=true;last=-1;return false;}
+   if(!story.getClientRects().length){video.pause();last=-1;return false;}
    const rect=story.getBoundingClientRect(),top=parseFloat(getComputedStyle(story).getPropertyValue('--story-top'))||149;
    const desired=clamp((top-rect.top)/Math.max(1,story.offsetHeight-stage.offsetHeight));
    const visible=rect.bottom>top&&rect.top<innerHeight;
-   if(!visible){video.pause();return false;}
-   progress=last<0?desired:THREE.MathUtils.lerp(progress,desired,.22);
+   if(!visible){video.pause();last=-1;return false;}
+   progress=last<0?desired:THREE.MathUtils.lerp(progress,desired,frameBlend);
    if(Math.abs(progress-desired)<.00015)progress=desired;
    if(progress===last){if(progress>.84&&video.dataset.manuallyPaused!=='true'&&video.paused)video.play().catch(()=>{});return false;}last=progress;
    const p=progress,assembly=smooth(0,.28,p),material=smooth(.28,.51,p),turn=smooth(.25,.67,p),reveal=smooth(.69,.84,p),dock=smooth(.87,1,p);
    lineMaterial.uniforms.uAssembly.value=assembly;
    lineMaterial.uniforms.uOpacity.value=renderer.isCanvasFallback?(1-smooth(.69,.84,p))*.55:(1-smooth(.35,.61,p))*.82;
-   for(const mat of materials)mat.opacity=material*(1-reveal);
+   // The canvas layer handles the footage crossfade; do not fade the hull twice.
+   for(const mat of materials)mat.opacity=material;
    grid.material.opacity=smooth(.1,.3,p)*(1-reveal)*.22;
    points.material.opacity=(1-smooth(.35,.65,p))*.4;
-   if(turn<.45)camera.position.lerpVectors(startPosition,turnPosition,smooth(0,.45,turn));
-   else camera.position.lerpVectors(turnPosition,endPosition,smooth(.45,1,turn));
+   camera.position.copy(cameraPath.getPointAt(turn));
+   // Portrait screens need a wider orbit; blend back into the render framing
+   // only for the final handover, where the footage itself is cover-cropped.
+   const portraitFraming=1+(Math.max(1,1.2/camera.aspect)-1)*(1-smooth(.82,1,turn));
+   camera.position.sub(focal).multiplyScalar(portraitFraming).add(focal);
    camera.lookAt(focal);
-   camera.quaternion.slerp(endQuaternion,smooth(.36,1,turn));
+   // The render's orientation only fits its final position. Blending it early
+   // looks away from the boat while the camera is still on the orbit.
+   camera.quaternion.slerp(endQuaternion,smooth(.92,1,turn));
    const endFov=THREE.MathUtils.radToDeg(2*Math.atan(Math.tan(THREE.MathUtils.degToRad(nativeFov)/2)*Math.min(1,nativeAspect/camera.aspect)));
    camera.fov=THREE.MathUtils.lerp(camera.aspect<1?57:40,endFov,smooth(.15,1,turn));camera.updateProjectionMatrix();
    renderer.render(scene,camera);
@@ -172,21 +185,22 @@ async function tide(){
    story.style.setProperty('--story-progress',p.toFixed(4));
    story.style.setProperty('--video-events',p>.83?'auto':'none');
    ui.inert=p>.88;
-   ui.querySelectorAll('button,a').forEach(el=>el.tabIndex=p>.88?-1:0);
-   const play=story.querySelector('.film-toggle');play.tabIndex=p>.83?0:-1;
+   uiControls.forEach(el=>el.tabIndex=p>.88?-1:0);
+   play.tabIndex=p>.83?0:-1;
    if(p>.84&&video.dataset.manuallyPaused!=='true'&&!document.hidden){if(video.paused)video.play().catch(()=>{});}
    else if(p<=.84){video.pause();if(video.readyState>0&&video.currentTime>.04)video.currentTime=0;}
    return Math.abs(progress-desired)>.00015;
   });
   schedule();
  }catch(error){
-  if(renderer)renderer.dispose();story.classList.remove('story-ready');ui.hidden=true;video.dataset.storyManaged='false';host.replaceChildren();
+  if(renderer)renderer.dispose();story.classList.remove('story-ready','story-static');ui.hidden=true;ui.inert=false;play.tabIndex=0;video.dataset.storyManaged='false';host.replaceChildren();
   console.warn('Tide 3D enhancement unavailable:',error.message);
  }
 }
 
 async function axis(){
- const panel=document.querySelector('.axis-3d-panel'),host=panel.querySelector('.axis-model-canvas'),range=panel.querySelector('input'),follow=panel.querySelector('button');
+ const panel=document.querySelector('.axis-3d-panel');if(!panel)return;
+ const host=panel.querySelector('.axis-model-canvas'),range=panel.querySelector('input'),follow=panel.querySelector('button');
  let renderer;
  try{
   const gltf=await loader.loadAsync('/assets/models/axis.glb');
@@ -216,10 +230,12 @@ async function axis(){
   renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();failed=true;panel.hidden=true;document.querySelector('.render-caption-label').hidden=true;renderer.dispose();ro.disconnect();},{once:true});
   jobs.push(()=>{
    if(failed||!panel.getClientRects().length)return false;
-   const rect=panel.getBoundingClientRect();if(rect.bottom<0||rect.top>innerHeight)return false;
+   const rect=panel.getBoundingClientRect();if(rect.bottom<0||rect.top>innerHeight){last=-1;return false;}
    const enabled=active();
-   const desired=manual?Number(range.value)/100:enabled?clamp((innerHeight*.8-rect.top)/(innerHeight*.5+rect.height*.8)):.25;
-   progress=last<0||manual?desired:THREE.MathUtils.lerp(progress,desired,.18);
+   // Pause holds the current pose. Explicit slider input remains available.
+   const desired=manual?Number(range.value)/100:enabled?clamp((innerHeight*.8-rect.top)/(innerHeight*.5+rect.height*.8)):progress;
+   follow.textContent=manual?'Follow scroll':enabled?'Following scroll':'Motion paused';
+   progress=last<0||manual?desired:THREE.MathUtils.lerp(progress,desired,frameBlend);
    if(Math.abs(progress-desired)<.00015)progress=desired;
    if(last===progress)return false;last=progress;
    for(const a of actions){a.paused=false;a.enabled=true;}
@@ -228,19 +244,28 @@ async function axis(){
    for(const mat of wireMaterials)mat.opacity=renderer.isCanvasFallback?.5:.04+(1-smooth(.05,.55,progress))*.19;
    if(!manual)range.value=String(Math.round(progress*100));
    range.setAttribute('aria-valuetext',`${Math.round(progress*100)} percent through the artist-authored animation`);
-   follow.textContent=manual?'Follow scroll':'Following scroll';
    renderer.render(scene,camera);
    return Math.abs(progress-desired)>.00015;
   });schedule();
  }catch(error){if(renderer)renderer.dispose();panel.hidden=true;console.warn('Axis 3D enhancement unavailable:',error.message);}
 }
 
-export function boot(){
- if(!active()||navigator.connection?.saveData)return;
- window.addEventListener('scroll',schedule,{passive:true});window.addEventListener('resize',schedule,{passive:true});
- document.addEventListener('visibilitychange',schedule);
- new MutationObserver(schedule).observe(root,{attributes:true,attributeFilter:['class']});
- // Filtering projects changes layout without necessarily generating a scroll event.
- document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>requestAnimationFrame(schedule)));
- axis();tide();
+let initialized=false;const loaded=new Set();
+export function boot(project='all'){
+ if(!active()||navigator.connection?.saveData)return false;
+ if(!initialized){
+  initialized=true;
+  window.addEventListener('scroll',schedule,{passive:true});window.addEventListener('resize',schedule,{passive:true});
+  document.addEventListener('visibilitychange',schedule);
+  reducedMotion?.addEventListener('change',schedule);
+  new MutationObserver(schedule).observe(root,{attributes:true,attributeFilter:['class']});
+  // Filtering projects changes layout without necessarily generating a scroll event.
+  document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>requestAnimationFrame(schedule)));
+ }
+ for(const name of project==='all'?['axis','tide']:[project]){
+  if(loaded.has(name))continue;
+  if(name!=='axis'&&name!=='tide')continue;
+  loaded.add(name);if(name==='axis')axis();else tide();
+ }
+ return true;
 }

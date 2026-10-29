@@ -12,7 +12,7 @@
  const phase=(el,start=.95,end=.05)=>{const r=el.getBoundingClientRect();return clamp((innerHeight*start-r.top)/(innerHeight*(start-end)+r.height*.22));};
  const visible=el=>{const r=el.getBoundingClientRect();return r.top<innerHeight+150&&r.bottom>-150;};
  let raf=0;
- function draw(){raf=0;const enabled=!reduce.matches;root.classList.toggle('kinetic-active',enabled);if(!enabled||document.hidden)return;
+ function draw(){raf=0;if(root.classList.contains('continuum-enabled'))return;const enabled=!reduce.matches;root.classList.toggle('kinetic-active',enabled);if(!enabled||document.hidden)return;
   const w=innerWidth,mobile=w<700;
   if(visible(disciplines)){
    const r=disciplines.getBoundingClientRect(),top=mobile?65:76,p=clamp((top-r.top)/Math.max(1,disciplines.offsetHeight-stage.offsetHeight)),e=ease(p),strength=mobile?.35:1;

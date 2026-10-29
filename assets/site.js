@@ -51,6 +51,7 @@
   // when autoplay is blocked or the device requests reduced motion/data usage.
   function playVisible(video){
     if(video.dataset.storyManaged==='true'||document.hidden)return;
+    if(root.classList.contains('continuum-enabled')&&video.dataset.continuumVisible!=='true')return;
     if(!motion||saveData){video.pause();video.controls=true;return;}
     video.play().catch(()=>{video.controls=true;});
   }

@@ -129,7 +129,7 @@ async function tide(){
   story.classList.add('story-ready');ui.hidden=false;
   function resize(){
    const toolbar=document.querySelector('.work-toolbar'),header=document.querySelector('.header');
-   const top=(header?.offsetHeight||0)+(toolbar?.offsetHeight||0);
+   const top=root.classList.contains('continuum-enabled')?0:(header?.offsetHeight||0)+(toolbar?.offsetHeight||0);
    story.style.setProperty('--story-top',`${top}px`);story.style.setProperty('--measured-story-top',`${top}px`);
    const w=screen.clientWidth,h=screen.clientHeight;if(w>0&&h>0&&(width!==w||height!==h)){width=w;height=h;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();last=-1;schedule();}
   }
@@ -147,8 +147,9 @@ async function tide(){
    if(!enabled){ui.inert=true;last=-1;return false;}
    if(!story.getClientRects().length){video.pause();last=-1;return false;}
    const rect=story.getBoundingClientRect(),top=parseFloat(getComputedStyle(story).getPropertyValue('--story-top'))||149;
-   const desired=clamp((top-rect.top)/Math.max(1,story.offsetHeight-stage.offsetHeight));
-   const visible=rect.bottom>top&&rect.top<innerHeight;
+   const continuous=root.classList.contains('continuum-enabled');
+   const desired=continuous?Number(story.dataset.continuumProgress||0):clamp((top-rect.top)/Math.max(1,story.offsetHeight-stage.offsetHeight));
+   const visible=continuous?story.dataset.continuumActive==='true':rect.bottom>top&&rect.top<innerHeight;
    if(!visible){video.pause();last=-1;return false;}
    progress=last<0?desired:THREE.MathUtils.lerp(progress,desired,frameBlend);
    if(Math.abs(progress-desired)<.00015)progress=desired;
@@ -230,10 +231,10 @@ async function axis(){
   renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();failed=true;panel.hidden=true;document.querySelector('.render-caption-label').hidden=true;renderer.dispose();ro.disconnect();},{once:true});
   jobs.push(()=>{
    if(failed||!panel.getClientRects().length)return false;
-   const rect=panel.getBoundingClientRect();if(rect.bottom<0||rect.top>innerHeight){last=-1;return false;}
+   const rect=panel.getBoundingClientRect(),continuous=root.classList.contains('continuum-enabled');if(rect.bottom<0||rect.top>innerHeight||continuous&&panel.dataset.continuumActive!=='true'){last=-1;return false;}
    const enabled=active();
    // Pause holds the current pose. Explicit slider input remains available.
-   const desired=manual?Number(range.value)/100:enabled?clamp((innerHeight*.8-rect.top)/(innerHeight*.5+rect.height*.8)):progress;
+   const desired=manual?Number(range.value)/100:enabled?(continuous?Number(panel.dataset.continuumProgress||0):clamp((innerHeight*.8-rect.top)/(innerHeight*.5+rect.height*.8))):progress;
    follow.textContent=manual?'Follow scroll':enabled?'Following scroll':'Motion paused';
    progress=last<0||manual?desired:THREE.MathUtils.lerp(progress,desired,frameBlend);
    if(Math.abs(progress-desired)<.00015)progress=desired;
@@ -256,6 +257,7 @@ export function boot(project='all'){
  if(!initialized){
   initialized=true;
   window.addEventListener('scroll',schedule,{passive:true});window.addEventListener('resize',schedule,{passive:true});
+  window.addEventListener('launchaxis:continuum',schedule);
   document.addEventListener('visibilitychange',schedule);
   reducedMotion?.addEventListener('change',schedule);
   new MutationObserver(schedule).observe(root,{attributes:true,attributeFilter:['class']});

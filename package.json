@@ -1,0 +1,14 @@
+{
+  "name": "launchaxis-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node tools/build-scroll.mjs",
+    "check:assets": "node tools/check-assets.mjs"
+  },
+  "devDependencies": {
+    "@napi-rs/canvas": "0.1.80",
+    "esbuild": "0.25.10",
+    "three": "0.180.0"
+  }
+}

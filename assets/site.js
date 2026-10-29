@@ -65,8 +65,9 @@
     button.addEventListener('click', async () => {
       if (video.paused) {
         state.manuallyPaused = false;
+        video.dataset.manuallyPaused = 'false';
         try { await video.play(); } catch (_) { video.controls = true; button.hidden = true; }
-      } else { state.manuallyPaused = true; video.pause(); }
+      } else { state.manuallyPaused = true; video.dataset.manuallyPaused = 'true'; video.pause(); }
     });
     video.addEventListener('play', sync);
     video.addEventListener('pause', sync);
@@ -103,7 +104,7 @@
       state.visible = entry.isIntersecting;
       if (!entry.isIntersecting) { video.pause(); return; }
       if (!state.tried && !saveData) { video.preload = 'metadata'; video.load(); state.tried = true; }
-      if (motion && !saveData && !state.manuallyPaused && !document.hidden) video.play().catch(() => {});
+      if (motion && !saveData && !state.manuallyPaused && !document.hidden && video.dataset.storyManaged !== 'true') video.play().catch(() => {});
     }), { threshold: 0.45 });
     videos.forEach(video => videoObserver.observe(video));
   }
@@ -220,7 +221,7 @@
     motionButton.setAttribute('aria-label',motion?'Pause animations and videos':'Enable animations and video previews');
     if(persist){try{localStorage.setItem('launchaxis-motion',motion?'on':'off');}catch(_){}}
     if(!motion){cancelAnimationFrame(raf);raf=0;videos.forEach(v=>v.pause());root.style.setProperty('--title-drift','0px');}
-    else{startAnimation();videos.forEach(v=>{const s=videoState.get(v);if(s.visible&&!s.manuallyPaused&&!saveData)v.play().catch(()=>{});});}
+    else{startAnimation();videos.forEach(v=>{const s=videoState.get(v);if(s.visible&&!s.manuallyPaused&&!saveData&&v.dataset.storyManaged!=='true')v.play().catch(()=>{});});}
     drawStill();
   }
   motionButton.addEventListener('click',()=>setMotion(!motion,true));
@@ -228,7 +229,7 @@
   reduce.addEventListener('change',e=>setMotion(!e.matches));
   document.addEventListener('visibilitychange',()=>{
     if(document.hidden){cancelAnimationFrame(raf);raf=0;videos.forEach(v=>v.pause());}
-    else{startAnimation();videos.forEach(v=>{const s=videoState.get(v);if(motion&&s.visible&&!s.manuallyPaused&&!saveData)v.play().catch(()=>{});});}
+    else{startAnimation();videos.forEach(v=>{const s=videoState.get(v);if(motion&&s.visible&&!s.manuallyPaused&&!saveData&&v.dataset.storyManaged!=='true')v.play().catch(()=>{});});}
   });
 
   let scrollScheduled=false;

@@ -20,7 +20,9 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="/assets/site.css">
   <link rel="stylesheet" href="/assets/render.css">
+  <link rel="stylesheet" href="/assets/scroll-scenes.css">
   <script src="/assets/site.js" defer></script>
+  <script type="module" src="/assets/scroll-scenes.js"></script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"LaunchAxis","url":"https://launchaxis.net/"}</script>
 </head>
 <body id="top">
@@ -65,6 +67,14 @@
           <div class="project-layout axis-layout">
             <div class="project-copy"><h3 id="axis-title" class="project-name" data-reveal>Axis<span class="lime">.</span></h3><h4>From an idea<br>to a movement.</h4><p>A robotic arm. A simulated world. An exploration of control, reaching, and learning—one experiment at a time.</p><div class="tags"><span>Robotics</span><span>Simulation</span><span>Control</span></div><details><summary>Inside the project <span aria-hidden="true">+</span></summary><div><p>Axis is the home of the robotic-arm project: exploring movement in simulation and documenting what is learned along the way.</p><p>The arm currently being tested is designed by <a class="credit-link" href="https://fabricreator.com/en" target="_blank" rel="noopener noreferrer">FabriCreator ↗</a>. The image and clip shown here are LaunchAxis rendering tests, not footage of a physical robot or a successful AI training run.</p></div></details></div>
             <figure class="render-block" data-reveal>
+              <div class="axis-3d-panel" hidden>
+                <div class="axis-model-heading"><span class="mono">AXIS / MOTION STUDY</span><span class="mono axis-model-status">Loading model</span></div>
+                <div class="axis-model-canvas" role="img" aria-label="Interactive 3D rendering of the robotic arm designed by FabriCreator"></div>
+                <div class="axis-model-caption"><span class="mono">Scroll to explore the motion</span><span class="axis-orbit-symbol" aria-hidden="true">↻</span></div>
+                <div class="axis-3d-controls"><label class="mono" for="axis-motion-range">Animation position</label><input id="axis-motion-range" type="range" min="0" max="100" value="0"><button type="button" class="axis-follow-scroll">Follow scroll</button></div>
+                <p class="axis-model-note">Artist-authored animation · not an AI training result</p>
+              </div>
+              <p class="render-caption-label mono" hidden>Original rendering test ↓</p>
               <div class="render-player project-visual"><div class="visual-label mono"><span>RENDERING TEST</span><span>002</span></div>
                 <video id="axis-video" class="axis-video" controls playsinline muted loop preload="none" poster="/assets/axis-render.png" aria-label="Rendering test of the robotic arm designed by FabriCreator"><source src="/assets/axis-render.mp4" type="video/mp4">Your browser cannot play this video. <a href="/assets/axis-render.mp4">Watch the rendering test.</a></video>
                 <button class="film-toggle" type="button" aria-controls="axis-video" aria-pressed="false" hidden><span class="play-symbol" aria-hidden="true">▶</span><span class="film-label">Play render</span></button>
@@ -76,12 +86,23 @@
         </article>
         <article class="project tide" id="tide" data-category="film" aria-labelledby="tide-title">
           <div class="project-top"><span class="mono">03 / ANIMATION &amp; FILM</span><span class="status"><span aria-hidden="true"></span> In development</span></div>
-          <div class="tide-cinema" data-reveal>
+          <div class="tide-story" aria-label="Tide: from a line to a living scene">
+            <div class="tide-stage">
+              <div class="tide-screen tide-cinema">
             <video id="tide-video" class="tide-video" controls playsinline muted loop preload="none" poster="/assets/tide-poster.jpg" aria-label="Tide work-in-progress sample: a wooden boat floating on water"><source src="/assets/tide-scene.mp4" type="video/mp4">Your browser cannot play this video. <a href="/assets/tide-scene.mp4">Watch the Tide sample.</a></video>
+            <div class="tide-3d" aria-hidden="true"></div>
             <div class="cinema-shade" aria-hidden="true"></div><div class="cinema-top mono"><span>BLENDER / WORK-IN-PROGRESS SCENE</span><span>00:08</span></div><h3 id="tide-title" class="tide-title">Tide</h3>
             <button class="film-toggle" type="button" aria-controls="tide-video" aria-pressed="false" hidden><span class="play-symbol" aria-hidden="true">▶</span><span class="film-label">Play scene</span></button>
+              </div>
+              <div class="tide-story-ui" hidden>
+                <div class="story-topline"><span class="mono">LA / A SCENE IN THE MAKING</span><a href="#tide-details" class="story-skip">Skip animation ↓</a></div>
+                <div class="story-heading"><p class="mono story-kicker">01 — FORM</p><p class="story-statement">Every scene<br>starts with a line.</p></div>
+                <div class="story-bottom"><span class="mono story-scroll-hint">Keep scrolling to build the scene ↓</span><nav class="story-steps" aria-label="Tide animation stages"><button type="button" data-story-step="0.2" aria-current="step"><span>01</span> Form</button><button type="button" data-story-step="0.5"><span>02</span> Material</button><button type="button" data-story-step="0.91"><span>03</span> Scene</button></nav></div>
+                <div class="story-progress" aria-hidden="true"><i></i></div>
+              </div>
+            </div>
           </div>
-          <div class="tide-description"><h4>A small boat.<br>A world of possibility.</h4><div><p>An unfolding journey across the water. Tide is a Blender short-film project exploring atmosphere, movement, and visual storytelling.</p><p class="muted">An actual sample scene from the project—not a finished trailer. The film is still in development; no release date has been announced.</p><div class="tags"><span>Blender</span><span>Animation</span><span>Storytelling</span></div></div></div>
+          <div class="tide-description" id="tide-details"><h4>A small boat.<br>A world of possibility.</h4><div><p>An unfolding journey across the water. Tide is a Blender short-film project exploring atmosphere, movement, and visual storytelling.</p><p class="muted">An actual sample scene from the project—not a finished trailer. The film is still in development; no release date has been announced.</p><div class="tags"><span>Blender</span><span>Animation</span><span>Storytelling</span></div></div></div>
         </article>
       </div>
     </section>

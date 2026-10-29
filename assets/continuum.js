@@ -1,5 +1,5 @@
-/* One continuous, reversible composition. Scroll stays native and every original
-   content node is retained. Reduced motion restores the readable document. */
+/* One continuous, reversible composition. Every original content node is
+   retained. Reduced motion restores the readable document and native input. */
 (()=>{
  'use strict';
  const root=document.documentElement,reduce=matchMedia('(prefers-reduced-motion: reduce)'),$=s=>document.querySelector(s);
@@ -9,7 +9,10 @@
  const clamp=v=>Math.max(0,Math.min(1,v)),mix=(a,b,p)=>a+(b-a)*p,smooth=(a,b,t)=>{const p=clamp((t-a)/(b-a));return p*p*(3-2*p);};
  const windowed=(t,a,b,c,d)=>smooth(a,b,t)*(1-smooth(c,d,t));
  const colors=[[0,[245,245,239]],[.85,[245,245,239]],[1.35,[23,45,35]],[2.2,[23,45,35]],[2.6,[217,235,173]],[3.1,[217,235,173]],[3.65,[245,245,239]],[6.6,[245,245,239]],[7.5,[16,21,15]],[11.8,[16,21,15]],[12.7,[31,53,36]],[14.8,[31,53,36]],[15.6,[20,37,26]]];
- let state=null,raf=0,last=0,current=0;
+ let state=null,raf=0,last=0,current=0,pace=null;
+ import('/assets/scroll-pace.js').then(({installSteadyWheel})=>{
+  pace=installSteadyWheel(()=>{if(!state||reduce.matches)return null;const start=scrollY+state.track.getBoundingClientRect().top-state.top;return {start,end:start+END*state.unit,unit:state.unit};});
+ }).catch(()=>{/* The native scroll timeline is a complete fallback. */});
  function sample(keys,t){let a=keys[0],b=keys.at(-1);for(let i=1;i<keys.length;i++){if(t<=keys[i][0]){a=keys[i-1];b=keys[i];break;}}const p=smooth(a[0],b[0],t);return a[1].map((v,i)=>mix(v,b[1][i],p));}
  function mount(){
   if(state||reduce.matches)return;
@@ -34,11 +37,11 @@
  function layer(el,alpha,dy=0,interactive=true){const a=clamp(alpha);style(el,'opacity',a.toFixed(4));style(el,'visibility',a<.002?'hidden':'visible');style(el,'--continuum-y',`${dy.toFixed(2)}px`);style(el,'pointer-events',a>.65&&interactive?'auto':'none');el.inert=a<.65||!interactive;el.setAttribute('aria-hidden',a<.15?'true':'false');}
  function card(el,box,opacity){const [x,y,w,h,r]=box;style(el,'left',`${x-w/2}%`);style(el,'top',`${y-h/2}%`);style(el,'width',`${w}%`);style(el,'height',`${h}%`);style(el,'transform',`rotate(${r}deg)`);style(el,'opacity',opacity);style(el,'visibility',opacity<.001?'hidden':'visible');}
  function resize(){if(!state)return;state.top=$('.header').offsetHeight;state.unit=Math.max(520,innerHeight*.92);state.track.style.height=`${END*state.unit+innerHeight-state.top}px`;state.track.style.setProperty('--continuum-top',`${state.top}px`);state.track.style.setProperty('--continuum-height',`${innerHeight-state.top}px`);schedule();}
- function go(t,animated=true){if(!state)return;const top=scrollY+state.track.getBoundingClientRect().top-state.top+t*state.unit;window.scrollTo({top,behavior:animated?'smooth':'instant'});}
+ function go(t,animated=true){if(!state)return;pace?.stop();const top=scrollY+state.track.getBoundingClientRect().top-state.top+t*state.unit;window.scrollTo({top,behavior:animated?'smooth':'instant'});}
  function draw(now){
   raf=0;if(!state||document.hidden)return;
   const s=state,n=s.nodes,mobile=innerWidth<700,rect=s.track.getBoundingClientRect(),desired=Math.max(0,Math.min(END,(s.top-rect.top)/s.unit)),dt=last?Math.min(.05,(now-last)/1000):1/60;last=now;
-  current=Math.abs(desired-current)>2||!s.drawn?desired:mix(current,desired,1-Math.exp(-15*dt));if(Math.abs(current-desired)<.0002)current=desired;s.drawn=true;
+  current=root.classList.contains('steady-scroll-active')||Math.abs(desired-current)>2||!s.drawn?desired:mix(current,desired,1-Math.exp(-15*dt));if(Math.abs(current-desired)<.0002)current=desired;s.drawn=true;
   const t=current;root.dataset.continuumTime=t.toFixed(4);
   const rgb=sample(colors,t).map(Math.round),dark=t>1.12&&t<2.4||t>7.08;root.classList.toggle('continuum-dark',dark);root.style.setProperty('--continuum-bg',`rgb(${rgb.join(' ')})`);root.style.setProperty('--continuum-ink',dark?'#edf2e5':'#17271d');
   // The same three images travel from the opening through the manifesto and
@@ -83,7 +86,7 @@
   window.dispatchEvent(new CustomEvent('launchaxis:continuum',{detail:{time:t}}));
   if(Math.abs(current-desired)>.0002)schedule();
  }
- function unmount(){if(!state)return;const s=state;cancelAnimationFrame(raf);raf=0;
+ function unmount(){if(!state)return;pace?.stop();const s=state;cancelAnimationFrame(raf);raf=0;
   for(const {el,home} of [...s.moved].reverse()){home.replaceWith(el);}
   for(const [el,styleValue] of s.styles){if(styleValue===null)el.removeAttribute('style');else el.setAttribute('style',styleValue);}
   for(const [el,a] of s.attributes){el.inert=a.inert;if(a.hidden===null)el.removeAttribute('aria-hidden');else el.setAttribute('aria-hidden',a.hidden);}

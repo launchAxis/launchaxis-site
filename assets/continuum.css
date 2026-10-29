@@ -181,3 +181,29 @@
  .continuum-portal .axis-model-caption .mono{font-size:8px;letter-spacing:0}
  .axis-reset-view{width:40px;height:40px;font-size:23px}
 }
+
+/* Unframed project studies: the mark and arm share the page's own surface. */
+.continuum-portal,.network-visual,.continuum-portal>.network-visual,
+.axis-3d-panel,.continuum-portal .axis-3d-panel{background:transparent;border:0;box-shadow:none}
+.network-visual canvas,.network-fallback,.network-visual .visual-label,
+.network-visual .visual-foot,.axis-model-heading,.axis-model-note,
+.render-player>.visual-label{display:none}
+.network-visual .aventis-brand{filter:none;mix-blend-mode:multiply;opacity:1}
+.axis-model-canvas,.continuum-portal .axis-model-canvas{inset:0 0 90px}
+.axis-model-caption,.continuum-portal .axis-model-caption{color:#53634c}
+.axis-reset-view{color:#415c37}
+.axis-reset-view:hover,.axis-reset-view:focus-visible{background:#415c3710;outline-color:#415c3760}
+.axis-model-canvas:focus-visible{outline-color:#415c3760}
+.continuum-portal .render-block>figcaption{background:transparent;color:#53634c}
+.continuum-portal .render-block>figcaption a,.continuum-portal .render-block>figcaption span{color:#53634c}
+@media(max-width:700px){.continuum-portal .axis-model-canvas{inset:0 0 65px}}
+
+/* Expand the content itself, with a matching icon and text transition. */
+.project .details-enhanced>.project-details-body{padding:0;overflow:hidden}
+.project-details-inner{padding:0 0 20px}
+.project .details-enhanced summary{transition:color .25s ease}
+.project .details-enhanced summary:hover{color:#5f803f}
+.project .details-enhanced summary span{display:inline-block;transition:transform .46s cubic-bezier(.22,1,.36,1)}
+.project .details-enhanced[data-expanded="true"] summary span{transform:rotate(45deg)}
+.project .details-enhanced[data-expanded="false"] summary span{transform:rotate(0)}
+@media(prefers-reduced-motion:reduce){.project .details-enhanced summary,.project .details-enhanced summary span{transition:none}}

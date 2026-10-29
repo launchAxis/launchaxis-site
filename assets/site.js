@@ -218,7 +218,7 @@
   window.addEventListener('scroll',()=>{if(!scrollScheduled){scrollScheduled=true;requestAnimationFrame(updateScroll);}},{passive:true});
   hero.addEventListener('pointermove',e=>{if(!motion||e.pointerType==='touch')return;const r=hero.getBoundingClientRect();pointerX=(e.clientX-r.left)/r.width-.5;pointerY=(e.clientY-r.top)/r.height-.5;},{passive:true});
   hero.addEventListener('pointerleave',()=>{pointerX=pointerY=0;});
-  createDrawable('axis-core',drawCore);createDrawable('network-canvas',drawNetwork);
+  createDrawable('axis-core',drawCore);
   if('ResizeObserver' in window){const ro=new ResizeObserver(resizeCanvases);drawables.forEach(d=>ro.observe(d.canvas.parentElement));}
   else window.addEventListener('resize',resizeCanvases,{passive:true});
   resizeCanvases();setMotion(motion);updateScroll();startAnimation();

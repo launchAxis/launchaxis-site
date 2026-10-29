@@ -3,7 +3,7 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 import {createAxisCameraControls} from './axis-camera.js';
 
-// Native scroll is the timeline. No wheel capture, scroll lock or forced snapping.
+// Document position is the timeline; the shared stage normalizes mouse-wheel pace.
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 const smooth=(a,b,v)=>{const t=clamp((v-a)/(b-a));return t*t*(3-2*t);};
 const root=document.documentElement;
@@ -36,6 +36,14 @@ export function canvasRenderer(){
  return {domElement:canvas,isCanvasFallback:true,dispose(){},setSize(w,h){width=w;height=h;canvas.width=Math.round(w*ratio);canvas.height=Math.round(h*ratio);},render(scene,camera){
   scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);
   ctx.setTransform(ratio,0,0,ratio,0,0);ctx.clearRect(0,0,width,height);ctx.lineWidth=.7;
+  // A simple ground plane for the arm, also in the no-WebGL fallback.
+  // Tide has no canvasFloor objects, so its vertex renderer is unchanged.
+  scene.traverse(object=>{
+   if(!object.visible||!object.userData.canvasFloor)return;
+   projector.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse).multiply(object.matrixWorld);
+   ctx.globalAlpha=object.material.opacity;ctx.fillStyle=`#${object.material.color.getHexString()}`;ctx.beginPath();
+   [0,1,3,2].forEach((index,i)=>{a.fromBufferAttribute(object.geometry.attributes.position,index).applyMatrix4(projector);const x=(a.x*.5+.5)*width,y=(-a.y*.5+.5)*height;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.closePath();ctx.fill();
+  });
   scene.traverse(object=>{
    if(!object.visible||(!object.isLineSegments&&!object.isPoints))return;
    const geometry=object.geometry,position=geometry.attributes.position,indices=geometry.index;
@@ -212,14 +220,19 @@ async function axis(){
   const rig=new THREE.Group();rig.scale.setScalar(scale);rig.position.copy(center).multiplyScalar(-scale);rig.add(model);
   const turntable=new THREE.Group();turntable.rotation.y=-.55;turntable.add(rig);scene.add(turntable);
   const camera=new THREE.PerspectiveCamera(38,1,.01,100);camera.position.set(4.8,2.2,5.5);camera.lookAt(0,.05,0);
-  const grid=new THREE.GridHelper(9,30,0x8b9f68,0x44523a);grid.position.y=(box.min.y-center.y)*scale-.025;grid.material.transparent=true;grid.material.opacity=.3;scene.add(grid);
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(7,7),new THREE.MeshStandardMaterial({color:0xe7e9df,roughness:1,transparent:true,opacity:.65,side:THREE.DoubleSide}));
+  floor.rotation.x=-Math.PI/2;floor.position.y=(box.min.y-center.y)*scale-.025;floor.receiveShadow=true;floor.userData.canvasFloor=true;scene.add(floor);
+  if(!renderer.isCanvasFallback){
+   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+   const key=scene.children.find(o=>o.isDirectionalLight);key.castShadow=true;key.shadow.mapSize.set(1024,1024);Object.assign(key.shadow.camera,{left:-6,right:6,top:6,bottom:-6,near:.1,far:40});key.shadow.bias=-.0002;key.shadow.normalBias=.02;
+  }
   const mixer=new THREE.AnimationMixer(model),actions=gltf.animations.map(c=>mixer.clipAction(c));
   const duration=Math.max(0,...gltf.animations.map(c=>c.duration));
   actions.forEach(a=>{a.setLoop(THREE.LoopOnce,1);a.clampWhenFinished=true;a.play();});
   // Edge overlays use each mesh's local coordinates and follow the original joints.
   const wireMaterials=[];
-  model.traverse(o=>{if(!o.isMesh)return;
-   const geometry=new THREE.EdgesGeometry(o.geometry,35),material=new THREE.LineBasicMaterial({color:0xb8d88c,transparent:true,opacity:.08});
+  model.traverse(o=>{if(!o.isMesh)return;o.castShadow=true;o.receiveShadow=true;
+   const geometry=new THREE.EdgesGeometry(o.geometry,35),material=new THREE.LineBasicMaterial({color:0x34523c,transparent:true,opacity:.08});
    const edges=new THREE.LineSegments(geometry,material);o.add(edges);wireMaterials.push(material);
   });
   panel.hidden=false;document.querySelector('.render-caption-label').hidden=false;
@@ -242,7 +255,7 @@ async function axis(){
    if(last===progress&&!cameraDirty)return false;last=progress;cameraDirty=false;
    for(const a of actions){a.paused=false;a.enabled=true;}
    mixer.setTime(duration*Math.min(.9999,progress));
-   for(const mat of wireMaterials)mat.opacity=renderer.isCanvasFallback?.5:.04+(1-smooth(.05,.55,progress))*.19;
+   for(const mat of wireMaterials)mat.opacity=renderer.isCanvasFallback?.65:.025+(1-smooth(.05,.55,progress))*.08;
    renderer.render(scene,camera);
    return Math.abs(progress-desired)>.00015;
   });schedule();

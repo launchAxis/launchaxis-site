@@ -1,8 +1,10 @@
 /* A single sticky stage from opening to studio. The contact block releases into
    ordinary document flow. Without JS/reduced motion the original page remains. */
-/* Hide only the scrollbar chrome, never native scrolling itself. */
-html,body{scrollbar-width:none;-ms-overflow-style:none}
-html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
+/* Hide scrollbar chrome on the page AND nested reading panels. Keep native
+   wheel, touch and keyboard scrolling so expanded content remains accessible. */
+*,*::before,*::after{scrollbar-width:none!important;-ms-overflow-style:none}
+*::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+.reading-progress,.story-progress{display:none!important}
 .continuum-enabled{scroll-padding-top:76px}
 .continuum-enabled body{background:var(--continuum-bg,#f5f5ef)}
 .continuum-enabled .header{background:var(--continuum-bg,#f5f5ef);color:var(--continuum-ink,#17271d);backdrop-filter:none;border:0}
@@ -54,10 +56,13 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 .continuum-stage .status{font-size:9px;color:inherit;border-color:#788c6b50}
 .continuum-stage .chapter-title{position:absolute;left:4%;top:11%;right:3%;margin:0;overflow:hidden;z-index:3}
 .continuum-stage .chapter-title .project-name{font-size:clamp(90px,14vw,220px);line-height:1.07;letter-spacing:-.07em;color:var(--continuum-ink);translate:var(--title-slide,0px) 0;mix-blend-mode:normal;max-width:none}
+/* The image starts at 34% of the stage. Limit this long heading by both
+   width and available height, including short/wide laptop viewports. */
+.continuum-stage .aventis .chapter-title .project-name{font-size:min(clamp(90px,14vw,220px),calc(var(--continuum-height,calc(100svh - 76px)) * .19));margin-bottom:0}
 .continuum-stage .chapter-title .project-name:after{display:none}
 .continuum-stage .project-name .lime{color:#608e3d}
 .continuum-stage .project-layout{position:absolute;inset:0;display:block}
-.continuum-stage .project-copy,.continuum-stage .aventis .project-copy,.continuum-stage .axis-layout .project-copy{position:absolute;top:44%;left:4%;width:27%;max-height:45%;overflow-y:auto;padding:0 8px 10px 0;scrollbar-width:thin;scrollbar-color:#71885d transparent;translate:0 var(--copy-rise,0px)}
+.continuum-stage .project-copy,.continuum-stage .aventis .project-copy,.continuum-stage .axis-layout .project-copy{position:absolute;top:44%;left:4%;width:27%;max-height:45%;overflow-y:auto;padding:0 8px 10px 0;translate:0 var(--copy-rise,0px)}
 .continuum-stage .project-copy h4{font-size:clamp(25px,2.8vw,43px);line-height:1.06;margin:0 0 22px}
 .continuum-stage .project-copy>p{font-size:15px;line-height:1.6;color:inherit;max-width:340px}
 .continuum-stage .project-copy .tags{margin-top:20px;gap:5px}
@@ -142,6 +147,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
  .continuum-stage>.work-heading{padding:0 7%;gap:25px}.continuum-stage .work-heading .display{font-size:12.5vw}.continuum-stage .work-heading .eyebrow{font-size:8px}.continuum-stage .work-intro{gap:20px}.continuum-stage .work-intro p{font-size:12px;max-width:170px}
  .continuum-stage .project-top{top:4%;left:6%;right:6%}.continuum-stage .project-top .mono,.continuum-stage .status{font-size:7px}.continuum-stage .status{padding:5px 7px}
  .continuum-stage .chapter-title{left:6%;top:8%;right:5%}.continuum-stage .chapter-title .project-name{font-size:20vw;line-height:1.05}
+ .continuum-stage .aventis .chapter-title .project-name{font-size:min(20vw,calc(var(--continuum-height,calc(100svh - 65px)) * .075))}
  .continuum-stage .project-copy,.continuum-stage .aventis .project-copy,.continuum-stage .axis-layout .project-copy{top:61%;left:6%;width:88%;max-height:31%;padding-bottom:5px}
  .continuum-stage .project-copy h4{font-size:25px;margin:0 0 10px}.continuum-stage .project-copy h4 br{display:none}.continuum-stage .project-copy>p{font-size:12px;line-height:1.5;max-width:480px}.continuum-stage .project-copy .tags{margin-top:10px}.continuum-stage .tags span{font-size:7px;padding:3px 6px}.continuum-stage .project details{margin-top:10px;padding:10px 0}.continuum-stage .project details summary{font-size:11px}.continuum-stage .project details p{font-size:12px}
  .continuum-portal .network-visual .visual-label{font-size:7px;top:12px;left:14px;right:14px}.continuum-portal .network-visual .visual-foot{font-size:7px;bottom:12px}.continuum-portal .network-visual .aventis-brand{width:68%;left:16%}

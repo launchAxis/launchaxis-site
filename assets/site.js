@@ -50,7 +50,8 @@
   // Muted inline loops play automatically on entry. Native controls appear only
   // when autoplay is blocked or the device requests reduced motion/data usage.
   function playVisible(video){
-    if(video.dataset.storyManaged==='true'||document.hidden)return;
+    if(video.dataset.storyManaged==='true'||video.dataset.scrollManaged==='true'||document.hidden)return;
+    if(video.id==='axis-video'&&root.classList.contains('continuum-enabled'))return;
     if(root.classList.contains('continuum-enabled')&&video.dataset.continuumVisible!=='true')return;
     if(!motion||saveData){video.pause();video.controls=true;return;}
     video.play().catch(()=>{video.controls=true;});
@@ -77,6 +78,7 @@
     const videoObserver = new IntersectionObserver(entries => entries.forEach(entry => {
       const video = entry.target, state = videoState.get(video);
       state.visible = entry.isIntersecting;
+      if(video.dataset.scrollManaged==='true'||video.id==='axis-video'&&root.classList.contains('continuum-enabled'))return;
       if (!entry.isIntersecting) { video.pause(); return; }
       if (!state.tried && !saveData) { video.preload = 'metadata'; video.load(); state.tried = true; }
       playVisible(video);

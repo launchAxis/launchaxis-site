@@ -9,7 +9,8 @@
  const clamp=v=>Math.max(0,Math.min(1,v)),mix=(a,b,p)=>a+(b-a)*p,smooth=(a,b,t)=>{const p=clamp((t-a)/(b-a));return p*p*(3-2*p);};
  const windowed=(t,a,b,c,d)=>smooth(a,b,t)*(1-smooth(c,d,t));
  const colors=[[0,[245,245,239]],[.85,[245,245,239]],[1.35,[23,45,35]],[2.2,[23,45,35]],[2.6,[217,235,173]],[3.1,[217,235,173]],[3.65,[245,245,239]],[6.6,[245,245,239]],[7.5,[16,21,15]],[11.8,[16,21,15]],[12.7,[31,53,36]],[14.8,[31,53,36]],[15.6,[20,37,26]]];
- let state=null,raf=0,last=0,current=0,pace=null;
+ let state=null,raf=0,last=0,current=0,pace=null,axisVideo=null,createVideo=null;
+ import('/assets/scroll-video.js').then(module=>{createVideo=module.createScrollVideo;if(state)axisVideo=createVideo($('#axis-video'),schedule);schedule();}).catch(()=>{/* The original video remains the fallback. */});
  import('/assets/scroll-pace.js').then(({installSteadyWheel})=>{
   pace=installSteadyWheel(()=>{if(!state||reduce.matches)return null;const start=scrollY+state.track.getBoundingClientRect().top-state.top;return {start,end:start+END*state.unit,unit:state.unit};});
  }).catch(()=>{/* The native scroll timeline is a complete fallback. */});
@@ -28,6 +29,7 @@
   const nodes={hero,manifesto,discipline,work,aventis,axis,tide,studio,notes,toolbar,boat,arm,ai,network,robot,story,description,prelude,principles};
   const badge=document.createElement('div');badge.className='continuum-caption mono';badge.setAttribute('aria-hidden','true');badge.innerHTML='<span>LA / A CONTINUOUS EXPLORATION</span><span>SCROLL TO CONTINUE ↓</span>';stage.append(badge);
   state={track,stage,portal,images,moved,styles,attributes,nodes,badge,unit:1,top:0};
+  if(createVideo&&!axisVideo)axisVideo=createVideo($('#axis-video'),schedule);
   for(const el of Object.values(nodes))attributes.set(el,{inert:el.inert,hidden:el.getAttribute('aria-hidden')});
   root.classList.add('continuum-enabled');root.classList.remove('kinetic-active','editorial-motion');
   current=0;last=0;resize();draw(performance.now());
@@ -63,11 +65,17 @@
   for(const [el,start,end] of [[n.aventis,3.4,5.65],[n.axis,5.3,7.55]]){style(el,'--title-slide',`${(1-smooth(start,start+.4,t))*100-smooth(end-.4,end,t)*100}px`);style(el,'--copy-rise',`${(1-smooth(start+.1,start+.55,t))*50}px`);}
   const networkA=windowed(t,3.25,3.75,5.25,5.8),axisA=windowed(t,5.2,5.8,7.3,7.9),tideA=smooth(7.3,7.95,t);
   layer(n.network,networkA,0,false);layer(n.robot,axisA);layer(n.story,tideA);
-  const portalBox=sample(mobile?[[0,[50,38,90,40]],[6.6,[50,38,90,40]],[7.7,[50,50,100,100]],[11.7,[50,50,100,100]],[12.5,[50,26,90,39]],[13.5,[50,26,90,39]],[14.5,[50,24,66,31]],[15.6,[50,24,52,24]]]:[[0,[65,65,62,62]],[6.6,[65,65,62,62]],[7.7,[50,50,100,100]],[11.7,[50,50,100,100]],[12.5,[24,48,44,69]],[13.5,[24,48,44,69]],[14.5,[24,44,37,55]],[15.6,[24,40,30,43]]],t);
+  const portalBox=sample(mobile?[[0,[50,38,90,40]],[6.6,[50,38,90,40]],[7.7,[50,50,100,100]],[11.7,[50,50,100,100]],[12.5,[50,26,90,39]],[13.5,[50,26,90,39]],[14.5,[50,24,66,31]],[15.6,[50,24,52,24]]]:[[0,[65,50,62,62]],[5.15,[65,50,62,62]],[5.8,[65,65,62,62]],[6.6,[65,65,62,62]],[7.7,[50,50,100,100]],[11.7,[50,50,100,100]],[12.5,[24,48,44,69]],[13.5,[24,48,44,69]],[14.5,[24,44,37,55]],[15.6,[24,40,30,43]]],t);
   const [x,y,w,h]=portalBox;style(s.portal,'left',`${x-w/2}%`);style(s.portal,'top',`${y-h/2}%`);style(s.portal,'width',`${w}%`);style(s.portal,'height',`${h}%`);style(s.portal,'opacity',smooth(3.25,3.65,t));style(s.portal,'visibility',t<3.22?'hidden':'visible');
   style(n.network,'--brand-rotate',`${(t-4.5)*8}deg`);style(n.network,'--brand-scale',1+(t-4.5)*.045);
-  const render=smooth(6.55,7.05,t);style(n.robot,'--render-mix',render);
-  const axisPanel=$('.axis-3d-panel');axisPanel.dataset.continuumProgress=clamp((t-5.65)/1.35).toFixed(5);axisPanel.dataset.continuumActive=String(axisA>.01&&render<.995);axisPanel.inert=render>.8;
+  const axisPanel=$('.axis-3d-panel'),video=$('#axis-video');
+  if(t>3)axisVideo?.prepare();
+  const videoProgress=clamp((t-6.55)/(7.85-6.55));axisVideo?.setProgress(videoProgress);video.dataset.scrollProgress=videoProgress.toFixed(5);
+  // Loading is not a reason to replace the 3D sequence with autoplay. Only
+  // hand over when both the interactive scene and a decoded video frame exist.
+  const sceneReady=axisPanel.dataset.sceneState==='ready',sceneFailed=axisPanel.dataset.sceneState==='error';
+  const render=sceneFailed?1:sceneReady&&video.dataset.scrubReady==='true'?smooth(6.55,7.05,t):0;style(n.robot,'--render-mix',render);
+  axisPanel.dataset.continuumProgress=clamp((t-5.65)/1.35).toFixed(5);axisPanel.dataset.continuumActive=String(axisA>.01&&render<.995);axisPanel.inert=render>.8;
   // This is the existing Tide timeline, unmodified: only its source of progress
   // comes from the shared stage. Its 24,625 vertices and shot registration stay.
   n.story.dataset.continuumProgress=clamp((t-TIDE_START)/(TIDE_END-TIDE_START)).toFixed(5);n.story.dataset.continuumActive=String(tideA>.005&&rect.bottom>s.top);
@@ -82,11 +90,11 @@
   layer(n.toolbar,windowed(t,3.4,3.7,7.1,7.35));
   style(s.badge,'opacity',1-windowed(t,3.3,3.7,11.3,11.8));
   n.toolbar.querySelectorAll('[data-project-link]').forEach(link=>{const id=t<5.5?'aventis':t<7.5?'axis':'tide';if(link.dataset.projectLink===id)link.setAttribute('aria-current','true');else link.removeAttribute('aria-current');});
-  const video=$('#axis-video');video.dataset.continuumVisible=String(axisA>.05&&render>.05);if(axisA<.01||render<.01)video.pause();else if(video.paused&&!document.hidden)video.play().catch(()=>video.controls=true);
+  video.dataset.continuumVisible=String(axisA>.05&&render>.05);
   window.dispatchEvent(new CustomEvent('launchaxis:continuum',{detail:{time:t}}));
   if(Math.abs(current-desired)>.0002)schedule();
  }
- function unmount(){if(!state)return;pace?.stop();const s=state;cancelAnimationFrame(raf);raf=0;
+ function unmount(){if(!state)return;pace?.stop();axisVideo?.dispose();axisVideo=null;if(reduce.matches){const video=$('#axis-video');video.autoplay=false;video.controls=true;video.pause();}const s=state;cancelAnimationFrame(raf);raf=0;
   for(const {el,home} of [...s.moved].reverse()){home.replaceWith(el);}
   for(const [el,styleValue] of s.styles){if(styleValue===null)el.removeAttribute('style');else el.setAttribute('style',styleValue);}
   for(const [el,a] of s.attributes){el.inert=a.inert;if(a.hidden===null)el.removeAttribute('aria-hidden');else el.setAttribute('aria-hidden',a.hidden);}
@@ -97,6 +105,7 @@
  document.addEventListener('click',e=>{if(!state)return;const step=e.target.closest('[data-story-step]');if(step){e.preventDefault();e.stopImmediatePropagation();go(mix(TIDE_START,TIDE_END,Number(step.dataset.storyStep)));return;}const link=e.target.closest('a[href^="#"]');if(!link)return;const id=decodeURIComponent(link.hash.slice(1));if(!(id in anchors))return;e.preventDefault();history.pushState(null,'',link.hash);go(anchors[id]);},true);
  window.addEventListener('popstate',()=>{const id=decodeURIComponent(location.hash.slice(1));if(state&&id in anchors)go(anchors[id],false);});
  addEventListener('scroll',schedule,{passive:true});addEventListener('resize',resize,{passive:true});document.addEventListener('visibilitychange',schedule);reduce.addEventListener('change',()=>{if(reduce.matches)unmount();else mount();});
+ addEventListener('launchaxis:scene-ready',schedule);
  addEventListener('load',()=>{resize();const id=decodeURIComponent(location.hash.slice(1));if(state&&id in anchors)go(anchors[id],false);},{once:true});
  mount();
 })();

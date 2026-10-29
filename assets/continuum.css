@@ -70,6 +70,9 @@
 .continuum-stage .project details{margin:20px 0 0;padding:13px 0;border-color:#788c6b50}
 .continuum-stage .project details summary{font-size:12px}
 .continuum-stage .project details p{font-size:13px;line-height:1.6}
+/* Let readers scroll an expanded panel without spilling a large wheel delta
+   into the main timeline. At its boundary the shared controller takes over. */
+.continuum-stage .project-copy,.continuum-stage .studio-inner{overscroll-behavior-y:contain}
 .continuum-portal{position:absolute;left:34%;top:16%;width:62%;height:79%;z-index:2;overflow:hidden;isolation:isolate;background:#111810;will-change:width,height,left,top}
 .continuum-portal>.network-visual,.continuum-portal>.render-block,.continuum-portal>.tide-story{position:absolute;inset:0;width:100%;height:100%;min-height:0;max-width:none;aspect-ratio:auto;border:0;margin:0;padding:0;translate:none;scale:1;transform:none;clip-path:none;transition:none;overflow:hidden}
 .continuum-portal>.network-visual{z-index:1;background:#142017}
@@ -84,7 +87,7 @@
 .continuum-portal .axis-model-note{bottom:38px;font-size:8px}
 .continuum-portal .render-caption-label{display:none}
 .continuum-portal .render-player{position:absolute;inset:0;aspect-ratio:auto;height:100%;width:100%;margin:0;border:0;opacity:var(--render-mix,0);z-index:3;pointer-events:none}
-.continuum-portal .axis-3d-panel[hidden]~.render-player{opacity:1}
+.continuum-portal .axis-3d-panel[data-scene-state="error"]~.render-player{opacity:1}
 .continuum-portal .render-player video{height:100%;width:100%;object-fit:cover;object-position:56% 50%;scale:1}
 .continuum-portal .render-block>figcaption{position:absolute;bottom:0;left:0;right:0;z-index:5;margin:0;padding:9px 20px;background:#152016eb;color:#cedcc0;font-size:9px;display:flex;gap:10px;justify-content:space-between}
 .continuum-portal .render-block>figcaption a{color:#eef4e4}

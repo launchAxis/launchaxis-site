@@ -7,6 +7,12 @@ export class WheelPace {
  stop(){this.active=false;this.direction=0;this.previous=0;this.until=0;}
 }
 
+// Browsers round document scroll positions. Never require an exact match with
+// the fractional end of a responsive timeline before returning native scroll.
+export function canPaceAt(y,direction,{start,end}){
+ return y>=start-1&&y<=end+1&&(direction>0?y<end-1:y>start+1);
+}
+
 export function installSteadyWheel(getRange){
  const root=document.documentElement,clock=new WheelPace();let frame=0,position=null;
  function stop(){clock.stop();cancelAnimationFrame(frame);frame=0;position=null;root.classList.remove('steady-scroll-active');}
@@ -20,12 +26,15 @@ export function installSteadyWheel(getRange){
   frame=0;const range=getRange();if(!range||document.hidden){stop();return;}
   const next=Math.min(range.end,Math.max(range.start,(position??scrollY)+clock.advance(now,range.unit)));position=next;
   window.scrollTo({top:next,behavior:'instant'});
-  if(clock.active&&next>range.start&&next<range.end)frame=requestAnimationFrame(draw);else stop();
+  // The first RAF timestamp can precede the wheel event, producing zero delta.
+  // Stay active when pointing INTO the range, even if still exactly at its edge.
+  const room=clock.direction>0?next<range.end-1:next>range.start+1;
+  if(clock.active&&room)frame=requestAnimationFrame(draw);else stop();
  }
  function wheel(event){
   if(event.ctrlKey||event.metaKey||event.shiftKey||Math.abs(event.deltaX)>Math.abs(event.deltaY)||!event.deltaY||!event.cancelable){stop();return;}
   const range=getRange(),direction=Math.sign(event.deltaY);
-  if(!range||nestedCanScroll(event.target,direction)||scrollY<range.start-1||scrollY>range.end+1||(direction<0&&scrollY<=range.start)||(direction>0&&scrollY>=range.end)){stop();return;}
+  if(!range||nestedCanScroll(event.target,direction)||!canPaceAt(scrollY,direction,range)){stop();return;}
   event.preventDefault();if(!clock.active)position=scrollY;clock.pulse(event.deltaY,performance.now());root.classList.add('steady-scroll-active');if(!frame)frame=requestAnimationFrame(draw);
  }
  addEventListener('wheel',wheel,{passive:false});

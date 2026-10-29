@@ -21,9 +21,11 @@ if(targets.length && 'IntersectionObserver' in window){
     });
   },{rootMargin:'550px 0px'});
   targets.forEach(t=>observer.observe(t));
-  const loadApproaching=()=>{if(!document.documentElement.classList.contains('continuum-enabled'))return;const t=Number(document.documentElement.dataset.continuumTime||0);if(t>4.65)request(targets.find(t=>t.id==='axis'));if(t>6.8)request(targets.find(t=>t.id==='tide'));};
+  // Fetch the arm during the opening, not less than a second before its entrance.
+  // This also covers a direct #axis visit. Tide still loads only as it approaches.
+  const loadApproaching=()=>{if(!document.documentElement.classList.contains('continuum-enabled'))return;const t=Number(document.documentElement.dataset.continuumTime||0);request(targets.find(t=>t.id==='axis'));if(t>5.5)request(targets.find(t=>t.id==='tide'));};
   window.addEventListener('launchaxis:continuum',loadApproaching);loadApproaching();
-  const refresh=()=>{if(eligible())targets.filter(t=>!requested.has(t)).forEach(t=>{observer.unobserve(t);observer.observe(t);});};
+  const refresh=()=>{if(eligible()){loadApproaching();targets.filter(t=>!requested.has(t)).forEach(t=>{observer.unobserve(t);observer.observe(t);});}};
   new MutationObserver(refresh).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
   matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',refresh);
   navigator.connection?.addEventListener?.('change',refresh);

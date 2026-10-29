@@ -210,6 +210,7 @@ async function tide(){
 
 async function axis(){
  const panel=document.querySelector('.axis-3d-panel');if(!panel)return;
+ panel.dataset.sceneState='loading';
  const host=panel.querySelector('.axis-model-canvas'),resetView=panel.querySelector('.axis-reset-view');
  let renderer,cameraInput;
  try{
@@ -235,14 +236,14 @@ async function axis(){
    const geometry=new THREE.EdgesGeometry(o.geometry,35),material=new THREE.LineBasicMaterial({color:0x34523c,transparent:true,opacity:.08});
    const edges=new THREE.LineSegments(geometry,material);o.add(edges);wireMaterials.push(material);
   });
-  panel.hidden=false;document.querySelector('.render-caption-label').hidden=false;
+  panel.hidden=false;panel.dataset.sceneState='ready';window.dispatchEvent(new CustomEvent('launchaxis:scene-ready'));document.querySelector('.render-caption-label').hidden=false;
   panel.querySelector('.axis-model-status').textContent=renderer.isCanvasFallback?'WIREFRAME VIEW':'LIVE 3D';
   let width=0,height=0,last=-1,progress=0,failed=false,cameraDirty=true;
   cameraInput=createAxisCameraControls(camera,host,resetView,()=>{cameraDirty=true;schedule();});
   renderer.domElement.setAttribute('aria-hidden','true');
   function resize(){const w=host.clientWidth,h=host.clientHeight;if(w&&h&&(w!==width||h!==height)){width=w;height=h;renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=w/h<1?44:38;camera.updateProjectionMatrix();cameraDirty=true;last=-1;schedule();}}
   const ro=new ResizeObserver(resize);ro.observe(host);resize();
-  renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();failed=true;panel.hidden=true;document.querySelector('.render-caption-label').hidden=true;cameraInput.dispose();renderer.dispose();ro.disconnect();},{once:true});
+  renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();failed=true;panel.hidden=true;panel.dataset.sceneState='error';window.dispatchEvent(new CustomEvent('launchaxis:scene-ready'));document.querySelector('.render-caption-label').hidden=true;cameraInput.dispose();renderer.dispose();ro.disconnect();},{once:true});
   jobs.push(()=>{
    if(failed||!panel.getClientRects().length)return false;
    const rect=panel.getBoundingClientRect(),continuous=root.classList.contains('continuum-enabled');if(rect.bottom<0||rect.top>innerHeight||continuous&&panel.dataset.continuumActive!=='true'){last=-1;return false;}
@@ -259,7 +260,7 @@ async function axis(){
    renderer.render(scene,camera);
    return Math.abs(progress-desired)>.00015;
   });schedule();
- }catch(error){cameraInput?.dispose();if(renderer)renderer.dispose();panel.hidden=true;console.warn('Axis 3D enhancement unavailable:',error.message);}
+ }catch(error){cameraInput?.dispose();if(renderer)renderer.dispose();panel.hidden=true;panel.dataset.sceneState='error';window.dispatchEvent(new CustomEvent('launchaxis:scene-ready'));console.warn('Axis 3D enhancement unavailable:',error.message);}
 }
 
 let initialized=false;const loaded=new Set();

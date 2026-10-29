@@ -91,9 +91,9 @@
             <figure class="render-block" data-reveal>
               <div class="axis-3d-panel" hidden>
                 <div class="axis-model-heading"><span class="mono">AXIS / MOTION STUDY</span><span class="mono axis-model-status">Loading model</span></div>
-                <div class="axis-model-canvas" role="img" aria-label="Interactive 3D rendering of the robotic arm designed by FabriCreator"></div>
-                <div class="axis-model-caption"><span class="mono">Scroll to explore the motion</span><span class="axis-orbit-symbol" aria-hidden="true">↻</span></div>
-                <div class="axis-3d-controls"><label class="mono" for="axis-motion-range">Animation position</label><input id="axis-motion-range" type="range" min="0" max="100" value="0"><button type="button" class="axis-follow-scroll">Follow scroll</button></div>
+                <div class="axis-model-canvas" tabindex="0" role="group" aria-roledescription="interactive 3D scene" aria-label="Robotic arm designed by FabriCreator" aria-describedby="axis-camera-help"></div>
+                <p class="sr-only" id="axis-camera-help">Drag to orbit the camera; right-drag to pan. Arrow keys pan, Shift plus arrow keys orbit, and R resets the view. Scroll to animate the arm without changing your camera angle. On a touch screen, drag sideways to orbit or swipe vertically to scroll.</p>
+                <div class="axis-model-caption"><span class="mono">Drag to orbit · scroll to animate</span><button type="button" class="axis-reset-view" aria-label="Reset camera view" title="Reset camera view"><span aria-hidden="true">↻</span></button></div>
                 <p class="axis-model-note">Artist-authored animation · not an AI training result</p>
               </div>
               <p class="render-caption-label mono" hidden>Original rendering test ↓</p>

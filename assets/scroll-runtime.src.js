@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
+import {createAxisCameraControls} from './axis-camera.js';
 
 // Native scroll is the timeline. No wheel capture, scroll lock or forced snapping.
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
@@ -201,15 +202,15 @@ async function tide(){
 
 async function axis(){
  const panel=document.querySelector('.axis-3d-panel');if(!panel)return;
- const host=panel.querySelector('.axis-model-canvas'),range=panel.querySelector('input'),follow=panel.querySelector('button');
- let renderer;
+ const host=panel.querySelector('.axis-model-canvas'),resetView=panel.querySelector('.axis-reset-view');
+ let renderer,cameraInput;
  try{
   const gltf=await loader.loadAsync('/assets/models/axis.glb');
   const scene=new THREE.Scene();lightScene(scene);renderer=rendererFor(host);renderer.toneMappingExposure=1.35;
   const model=gltf.scene;model.updateMatrixWorld(true);
   const box=new THREE.Box3().setFromObject(model),size=box.getSize(vec()),center=box.getCenter(vec()),scale=3/Math.max(size.x,size.y,size.z);
   const rig=new THREE.Group();rig.scale.setScalar(scale);rig.position.copy(center).multiplyScalar(-scale);rig.add(model);
-  const turntable=new THREE.Group();turntable.add(rig);scene.add(turntable);
+  const turntable=new THREE.Group();turntable.rotation.y=-.55;turntable.add(rig);scene.add(turntable);
   const camera=new THREE.PerspectiveCamera(38,1,.01,100);camera.position.set(4.8,2.2,5.5);camera.lookAt(0,.05,0);
   const grid=new THREE.GridHelper(9,30,0x8b9f68,0x44523a);grid.position.y=(box.min.y-center.y)*scale-.025;grid.material.transparent=true;grid.material.opacity=.3;scene.add(grid);
   const mixer=new THREE.AnimationMixer(model),actions=gltf.animations.map(c=>mixer.clipAction(c));
@@ -223,32 +224,29 @@ async function axis(){
   });
   panel.hidden=false;document.querySelector('.render-caption-label').hidden=false;
   panel.querySelector('.axis-model-status').textContent=renderer.isCanvasFallback?'WIREFRAME VIEW':'LIVE 3D';
-  let width=0,height=0,manual=false,last=-1,progress=0,failed=false;
-  function resize(){const w=host.clientWidth,h=host.clientHeight;if(w&&h&&(w!==width||h!==height)){width=w;height=h;renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=w/h<1?44:38;camera.updateProjectionMatrix();last=-1;schedule();}}
+  let width=0,height=0,last=-1,progress=0,failed=false,cameraDirty=true;
+  cameraInput=createAxisCameraControls(camera,host,resetView,()=>{cameraDirty=true;schedule();});
+  renderer.domElement.setAttribute('aria-hidden','true');
+  function resize(){const w=host.clientWidth,h=host.clientHeight;if(w&&h&&(w!==width||h!==height)){width=w;height=h;renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=w/h<1?44:38;camera.updateProjectionMatrix();cameraDirty=true;last=-1;schedule();}}
   const ro=new ResizeObserver(resize);ro.observe(host);resize();
-  range.addEventListener('input',()=>{manual=true;follow.textContent='Follow scroll';schedule();});
-  follow.addEventListener('click',()=>{manual=false;last=-1;schedule();});
-  renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();failed=true;panel.hidden=true;document.querySelector('.render-caption-label').hidden=true;renderer.dispose();ro.disconnect();},{once:true});
+  renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();failed=true;panel.hidden=true;document.querySelector('.render-caption-label').hidden=true;cameraInput.dispose();renderer.dispose();ro.disconnect();},{once:true});
   jobs.push(()=>{
    if(failed||!panel.getClientRects().length)return false;
    const rect=panel.getBoundingClientRect(),continuous=root.classList.contains('continuum-enabled');if(rect.bottom<0||rect.top>innerHeight||continuous&&panel.dataset.continuumActive!=='true'){last=-1;return false;}
    const enabled=active();
-   // Pause holds the current pose. Explicit slider input remains available.
-   const desired=manual?Number(range.value)/100:enabled?(continuous?Number(panel.dataset.continuumProgress||0):clamp((innerHeight*.8-rect.top)/(innerHeight*.5+rect.height*.8))):progress;
-   follow.textContent=manual?'Follow scroll':enabled?'Following scroll':'Motion paused';
-   progress=last<0||manual?desired:THREE.MathUtils.lerp(progress,desired,frameBlend);
+   // Scroll only changes joint poses. Camera position, target and orientation
+   // belong to the visitor and survive forward/reverse scrolling and re-entry.
+   const desired=enabled?(continuous?Number(panel.dataset.continuumProgress||0):clamp((innerHeight*.8-rect.top)/(innerHeight*.5+rect.height*.8))):progress;
+   progress=last<0?desired:THREE.MathUtils.lerp(progress,desired,frameBlend);
    if(Math.abs(progress-desired)<.00015)progress=desired;
-   if(last===progress)return false;last=progress;
+   if(last===progress&&!cameraDirty)return false;last=progress;cameraDirty=false;
    for(const a of actions){a.paused=false;a.enabled=true;}
    mixer.setTime(duration*Math.min(.9999,progress));
-   turntable.rotation.y=-.55+progress*1.1;
    for(const mat of wireMaterials)mat.opacity=renderer.isCanvasFallback?.5:.04+(1-smooth(.05,.55,progress))*.19;
-   if(!manual)range.value=String(Math.round(progress*100));
-   range.setAttribute('aria-valuetext',`${Math.round(progress*100)} percent through the artist-authored animation`);
    renderer.render(scene,camera);
    return Math.abs(progress-desired)>.00015;
   });schedule();
- }catch(error){if(renderer)renderer.dispose();panel.hidden=true;console.warn('Axis 3D enhancement unavailable:',error.message);}
+ }catch(error){cameraInput?.dispose();if(renderer)renderer.dispose();panel.hidden=true;console.warn('Axis 3D enhancement unavailable:',error.message);}
 }
 
 let initialized=false;const loaded=new Set();

@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 import {createAxisCameraControls} from '../assets/axis-camera.js';
 
 // Test input/camera behavior without a browser or WebGL dependency.
@@ -14,7 +16,7 @@ class Surface extends EventTarget {
 const send=(host,type,values={})=>{const e=new Event(type,{cancelable:true});Object.assign(e,values);host.dispatchEvent(e);return e;};
 const pointer=(host,type,x,y,button=0)=>send(host,type,{pointerId:1,pointerType:'mouse',clientX:x,clientY:y,pageX:x,pageY:y,button});
 const host=new Surface(),reset=new Surface(),camera=new THREE.PerspectiveCamera(38,2,.01,100);
-camera.position.set(-4.8,2.2,5.5);camera.lookAt(0,.05,0);
+camera.position.set(4.8,2.2,-5.5);camera.lookAt(0,.05,0);
 let redraws=0;
 const input=createAxisCameraControls(camera,host,reset,()=>redraws++);
 const homePosition=camera.position.clone(),homeOrientation=camera.quaternion.clone();
@@ -47,6 +49,24 @@ input.dispose();
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 assert(!html.includes('axis-motion-range'),'The old animation slider must be removed');
 const runtime=readFileSync(new URL('../assets/scroll-runtime.src.js',import.meta.url),'utf8');
-assert(runtime.includes('camera.position.set(-4.8,2.2,5.5)'),'The opening and reset camera should give a side view');
+assert(runtime.includes('camera.position.set(4.8,2.2,-5.5)'),'The opening and reset camera should give a right-facing side view');
 assert(!/turntable\.rotation\.y\s*=.*progress/.test(runtime),'Scroll must not rotate the whole model around a stationary camera');
+// Check the actual exported starting pose, not just the camera coordinates.
+const buffer=readFileSync(new URL('../assets/models/axis.glb',import.meta.url));
+const gltf=await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).parseAsync(buffer.buffer.slice(buffer.byteOffset,buffer.byteOffset+buffer.byteLength),'');
+const box=new THREE.Box3().setFromObject(gltf.scene),size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3()),scale=3/Math.max(size.x,size.y,size.z);
+const rig=new THREE.Group();rig.scale.setScalar(scale);rig.position.copy(center).multiplyScalar(-scale);rig.add(gltf.scene);
+const turntable=new THREE.Group();turntable.rotation.y=-.55;turntable.add(rig);
+const actualMixer=new THREE.AnimationMixer(gltf.scene);
+for(const clip of gltf.animations)actualMixer.clipAction(clip).play();
+actualMixer.setTime(0);turntable.updateMatrixWorld(true);camera.updateMatrixWorld(true);
+const jaw=name=>new THREE.Box3().setFromObject(gltf.scene.getObjectByName(name)).getCenter(new THREE.Vector3());
+const gripper=jaw('Pinza1').add(jaw('Pinza2')).multiplyScalar(.5);
+const shoulder=gltf.scene.getObjectByName('Eje_Central_pivot').getWorldPosition(new THREE.Vector3());
+const rightwardSpan=gripper.clone().project(camera).x-shoulder.clone().project(camera).x;
+assert(rightwardSpan>.15,'The actual gripper must point clearly RIGHT of the shoulder on screen');
+const reach=gripper.clone().sub(shoulder);reach.y=0;reach.normalize();
+const viewing=camera.position.clone();viewing.y=0;viewing.normalize();
+assert(Math.abs(reach.dot(viewing))<.4,'The starting view should show the reach from the side, not end-on');
+console.log('PASS: actual GLB starting pose faces right with a side-on silhouette.');
 console.log('PASS: drag orbit, persistent camera during pose updates, native wheel/touch scrolling, keyboard access, reset, and slider removal.');

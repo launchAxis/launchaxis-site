@@ -19,9 +19,9 @@ for(let d=0;d<=SCROLL_END;d+=.001){
  if(intro>.999)readableBlender+=.001;
  assert.equal(intro*arm,0,'Axis and Blender title must never overlap');
 }
-assert(readableWork/.85>2.5,'Work heading needs at least 2.5 seconds at the wheel pace');
+assert(readableWork/.85>1.6&&readableWork/.85<1.95,'Work heading should be readable without the previous long hold');
 assert(timeline.includes('const cardsOut=1-smooth(2.92,3.22,t)'),'Travelling images must clear before the heading reading hold');
-assert(readableBlender/.85>2,'Delaying Blender must not shorten its reading time');
+assert(readableBlender/.85>1.5&&readableBlender/.85<1.85,'Blender introduction should have a shorter, readable pause');
 for(let t=0;t<=END;t+=.01)assert(Math.abs(storyTime(scrollTime(t))-t)<1e-10,'Anchors must use inverse timing');
 assert(Math.abs(storyTime(SCROLL_END)-END)<1e-10,'The timeline must still reach the footer');
 const sample=vm.runInNewContext(timeline.match(/ function sample[^\n]+/)[0]+';sample',{smooth,mix});

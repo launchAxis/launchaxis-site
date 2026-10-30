@@ -7,7 +7,7 @@
  const END=16.9,TIDE_START=8.95,TIDE_END=13.45;
  // Add scroll space only at fully visible headings. Scene clocks keep their
  // original timing, and anchors use the inverse mapping in either direction.
- const READING_HOLDS=[[3.28,2],[8.5,1]];
+ const READING_HOLDS=[[3.28,1.25],[8.5,.55]];
  const SCROLL_END=END+READING_HOLDS.reduce((total,[,duration])=>total+duration,0);
  function storyTime(distance){let offset=0;for(const [at,duration] of READING_HOLDS){if(distance<at+offset)return distance-offset;if(distance<=at+offset+duration)return at;offset+=duration;}return distance-offset;}
  function scrollTime(t){return t+READING_HOLDS.reduce((total,[at,duration])=>total+(t>at?duration:0),0);}

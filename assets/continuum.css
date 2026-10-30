@@ -210,3 +210,14 @@
 .project .details-enhanced[data-expanded="true"] summary span{transform:rotate(45deg)}
 .project .details-enhanced[data-expanded="false"] summary span{transform:rotate(0)}
 @media(prefers-reduced-motion:reduce){.project .details-enhanced summary,.project .details-enhanced summary span{transition:none}}
+
+/* Small framing lift for the interactive arm only; the render stays untouched. */
+.axis-model-canvas{transform:translateY(clamp(-40px,-4vh,-20px))}
+@media(max-width:700px){.axis-model-canvas{transform:translateY(-16px)}}
+
+/* Tide remains an autoplay cinematic surface, including media-error fallbacks. */
+#tide-video{pointer-events:none}
+#tide-video::-webkit-media-controls,
+#tide-video::-webkit-media-controls-enclosure,
+#tide-video::-webkit-media-controls-panel,
+#tide-video::-webkit-media-controls-start-playback-button{display:none!important}

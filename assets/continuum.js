@@ -79,7 +79,8 @@
   // This is the existing Tide timeline, unmodified: only its source of progress
   // comes from the shared stage. Its 24,625 vertices and shot registration stay.
   n.story.dataset.continuumProgress=clamp((t-TIDE_START)/(TIDE_END-TIDE_START)).toFixed(5);n.story.dataset.continuumActive=String(tideA>.005&&rect.bottom>s.top);
-  style(n.story,'--continuum-story-ui',1-smooth(11.0,11.35,t));
+  // The introductory title is fully gone at 8.15 before the vertex copy enters.
+  style(n.story,'--continuum-story-ui',smooth(8.18,8.42,t)*(1-smooth(11.0,11.35,t)));
   layer(n.tide,0);layer(n.prelude,windowed(t,7.25,7.55,7.85,8.15),(1-smooth(7.25,7.6,t))*65);
   layer(n.description,windowed(t,11.0,11.35,11.9,12.3),(1-smooth(11,11.4,t))*55);
   style(n.story,'--continuum-film-shade',windowed(t,11.0,11.35,12,12.45)*.5);

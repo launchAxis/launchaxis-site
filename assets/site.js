@@ -47,8 +47,16 @@
     document.querySelectorAll('[data-reveal]').forEach(el => reveal.observe(el));
   }
 
-  // Muted inline loops play automatically on entry. Native controls appear only
-  // when autoplay is blocked or the device requests reduced motion/data usage.
+  // Tide is a cinematic surface, not an interactive video player. Keep fallback
+  // code from reintroducing controls after a rejected play() or a media error.
+  const tideVideo = document.querySelector('#tide-video');
+  if (tideVideo) {
+    const hideControls = () => { if (tideVideo.controls) tideVideo.controls = false; };
+    hideControls();
+    new MutationObserver(hideControls).observe(tideVideo, { attributes: true, attributeFilter: ['controls'] });
+  }
+  // Muted inline loops play automatically on entry. Other videos retain their
+  // native fallback controls; reduced-motion/data preferences are respected.
   function playVisible(video){
     if(video.dataset.storyManaged==='true'||video.dataset.scrollManaged==='true'||document.hidden)return;
     if(video.id==='axis-video'&&root.classList.contains('continuum-enabled'))return;

@@ -1,7 +1,7 @@
 /* Fit the approved longer labels without changing the visual language. */
 .continuum-stage .discipline-links a{font-size:clamp(30px,6vw,102px)}
-/* The shorter Animation label belongs near the centre, not at the far edge. */
-.discipline-links a:nth-child(3){align-self:center}
+/* Keep the staggered progression without pushing the shorter label to the edge. */
+.discipline-links a:nth-child(3){align-self:center;margin-left:26%}
 .social-grid>a{grid-template-columns:minmax(0,1fr) auto}
 .contact .footer{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:24px}
 .contact .footer>.footer-joke{display:block;max-width:640px;justify-self:center;text-align:center;font-family:var(--sans,Arial,sans-serif);font-size:12px;line-height:1.6;text-transform:none;letter-spacing:0;min-height:3.2em}

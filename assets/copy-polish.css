@@ -1,7 +1,11 @@
 /* Fit the approved longer labels without changing the visual language. */
 .continuum-stage .discipline-links a{font-size:clamp(30px,6vw,102px)}
-/* Keep the staggered progression without pushing the shorter label to the edge. */
-.discipline-links a:nth-child(3){align-self:center;margin-left:26%}
+/* Centre the whole staircase by its intrinsic width, not each row separately. */
+.continuum-stage .discipline-links{display:grid;grid-template-columns:repeat(2,clamp(40px,14vw,240px)) max-content;justify-content:center;align-content:center;column-gap:0;row-gap:clamp(18px,2.8vh,34px)}
+.continuum-stage .discipline-links a{align-self:start;justify-self:start;margin:0}
+.continuum-stage .discipline-links a:nth-child(1){grid-column:1/-1;grid-row:1}
+.continuum-stage .discipline-links a:nth-child(2){grid-column:2/-1;grid-row:2}
+.continuum-stage .discipline-links a:nth-child(3){grid-column:3;grid-row:3}
 .social-grid>a{grid-template-columns:minmax(0,1fr) auto}
 .contact .footer{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:24px}
 .contact .footer>.footer-joke{display:block;max-width:640px;justify-self:center;text-align:center;font-family:var(--sans,Arial,sans-serif);font-size:12px;line-height:1.6;text-transform:none;letter-spacing:0;min-height:3.2em}

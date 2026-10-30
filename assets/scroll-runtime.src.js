@@ -131,7 +131,7 @@ async function tide(){
   let failed=false,lastPhase=-1,last=-1,progress=0,width=0,height=0;
   const label=story.querySelector('.story-kicker'),statement=story.querySelector('.story-statement'),buttons=[...story.querySelectorAll('[data-story-step]')];
   const uiControls=[...ui.querySelectorAll('button,a')];
-  const stateCopy=[['01 — VERTICES','A thousand directions.<br>One possibility.'],['02 — FORM','Every point.<br>Finding its place.'],['03 — ATMOSPHERE','And then,<br>a world.']];
+  const stateCopy=[['VERTICES','One piece at a time...'],['FORM','The boat takes shape.'],['SCENE','The scene comes together.']];
   video.dataset.storyManaged='true';video.autoplay=false;video.pause();
   // End on the source Blender camera. Verify the shot match in browser QA.
   video.preload='auto';video.addEventListener('loadeddata',schedule,{once:true});video.load();

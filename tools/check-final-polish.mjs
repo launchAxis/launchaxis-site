@@ -26,5 +26,5 @@ assert(timeline.includes("t<8.18||t>=11.35?'hidden':'visible'"),'Tide UI must al
 assert.equal((html.match(/class="credit-arrow"/g)||[]).length,2);
 assert(css.includes('display:inline-flex;flex-direction:row;flex-wrap:nowrap;'));
 for(const path of ['continuum.js','continuum.css','render.css','site.js']){
- assert(html.includes('/assets/'+path+'?v=20261030b'),'Returning browsers must request the updated '+path);
+ assert(html.includes('/assets/'+path+'?v=20261030c'),'Returning browsers must request the updated '+path);
 }

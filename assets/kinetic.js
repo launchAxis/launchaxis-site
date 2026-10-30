@@ -4,9 +4,7 @@
  const root=document.documentElement,reduce=matchMedia('(prefers-reduced-motion: reduce)'),$=s=>document.querySelector(s);
  const disciplines=$('.discipline-strip'),stage=$('.discipline-stage'),work=$('.work-heading'),studio=$('.studio'),contact=$('.contact'),footer=$('.footer-brand'),prelude=$('.tide-prelude'),manifesto=$('.manifesto');
  const chapters=[...document.querySelectorAll('#aventis,#axis')];
- chapters.forEach((el,i)=>{const title=el.querySelector('.project-name'),wrap=document.createElement('div');wrap.className='chapter-title';title.setAttribute('aria-label',title.textContent.trim());title.dataset.chapter=`0${i+1} / EXPLORATION`;el.insertBefore(wrap,el.querySelector('.project-layout'));wrap.append(title);});
- const principles=[...document.querySelectorAll('.principles>div')];
- principles.forEach((el,i)=>{const verb=document.createElement('span');verb.className='principle-verb';verb.setAttribute('aria-hidden','true');verb.textContent=['Think.','Make.','Repeat.'][i];el.prepend(verb);});
+ chapters.forEach((el,i)=>{const title=el.querySelector('.project-name'),wrap=document.createElement('div');wrap.className='chapter-title';title.setAttribute('aria-label',title.textContent.trim());title.dataset.chapter=el.id==='aventis'?'ARTIFICIAL INTELLIGENCE':'ROBOTICS';el.insertBefore(wrap,el.querySelector('.project-layout'));wrap.append(title);});
  root.classList.add('kinetic-ready');
  const clamp=n=>Math.min(1,Math.max(0,n)),ease=p=>p*p*(3-2*p),set=(el,key,value)=>el.style.setProperty(key,value);
  const phase=(el,start=.95,end=.05)=>{const r=el.getBoundingClientRect();return clamp((innerHeight*start-r.top)/(innerHeight*(start-end)+r.height*.22));};
@@ -29,7 +27,7 @@
    set(el,'--brand-rotate',`${(travel-.5)*18}deg`);set(el,'--brand-scale',String(.88+travel*.24));set(el,'--render-scale',String(1.16-travel*.16));
   });
   if(visible(prelude)){const p=ease(phase(prelude));set(prelude,'--prelude-scale',String(.86+p*.14));set(prelude,'--prelude-y',`${(1-p)*80}px`);}
-  if(visible(studio)){set(studio,'--studio-x',`${(1-ease(phase(studio)))*(mobile?30:100)}px`);principles.forEach((el,i)=>set(el,'--principle-x',`${(1-ease(phase(el)))*(i===1?-1:1)*(mobile?35:130)}px`));}
+  if(visible(studio)){set(studio,'--studio-x',`${(1-ease(phase(studio)))*(mobile?30:100)}px`);}
   if(visible(contact)){const p=ease(phase(contact));set(contact,'--contact-x',`${(1-p)*(mobile?25:140)}px`);set(contact,'--contact-turn',`${(1-p)*-55}deg`);set(contact,'--social-rise',`${(1-ease(phase($('.social-grid'))))*70}px`);}
   if(visible(footer)){const p=ease(phase(footer));set(footer,'--footer-rise',`${(1-p)*110}px`);set(footer,'--footer-scale',String(.88+p*.12));}
   if(visible(manifesto))set(manifesto,'--mark-turn',`${(1-phase(manifesto))*-90}deg`);

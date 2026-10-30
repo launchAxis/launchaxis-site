@@ -1,0 +1,13 @@
+/* Fit the approved longer labels without changing the visual language. */
+.continuum-stage .discipline-links a{font-size:clamp(30px,6vw,102px)}
+.social-grid>a{grid-template-columns:minmax(0,1fr) auto}
+.contact .footer{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:24px}
+.contact .footer>.footer-joke{display:block;max-width:640px;justify-self:center;text-align:center;font-family:var(--sans,Arial,sans-serif);font-size:12px;line-height:1.6;text-transform:none;letter-spacing:0;min-height:3.2em}
+@media(max-width:700px){
+ .header-inner{gap:8px}
+ .brand{width:clamp(82px,23vw,120px);flex-shrink:0}
+ .main-nav{width:auto;min-width:0;gap:clamp(7px,1.6vw,11px);font-size:10px}
+ .continuum-stage .discipline-links a{font-size:7.3vw}
+ .contact .footer{grid-template-columns:1fr auto;gap:18px}
+ .contact .footer>.footer-joke{grid-column:1/-1;grid-row:1;text-align:left;justify-self:start;max-width:100%;font-size:12px;min-height:4.8em}
+}

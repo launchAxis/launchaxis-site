@@ -221,3 +221,12 @@
 #tide-video::-webkit-media-controls-enclosure,
 #tide-video::-webkit-media-controls-panel,
 #tide-video::-webkit-media-controls-start-playback-button{display:none!important}
+
+/* The designer credit is one non-wrapping row; its vector arrow is not a caption. */
+.render-block figcaption a.creator-credit,a.creator-credit{
+ display:inline-flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:.3em;white-space:nowrap;
+}
+a.creator-credit>.credit-arrow{
+ display:block;flex:0 0 1em;width:1em;height:1em;fill:none;stroke:currentColor;
+ stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;
+}

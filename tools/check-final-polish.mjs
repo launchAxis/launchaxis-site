@@ -21,3 +21,10 @@ for(let t=7;t<9;t+=.001){
  assert.equal(prelude*vertices,0,'Tide intro and vertex copy cannot be visible together, in either scroll direction');
 }
 console.log('PASS: raised model only, inline credit arrow, control-free Tide, Contact label and non-overlapping Tide copy.');
+
+assert(timeline.includes("t<8.18||t>=11.35?'hidden':'visible'"),'Tide UI must also have a hard visibility gate');
+assert.equal((html.match(/class="credit-arrow"/g)||[]).length,2);
+assert(css.includes('display:inline-flex;flex-direction:row;flex-wrap:nowrap;'));
+for(const path of ['continuum.js','continuum.css','render.css','site.js']){
+ assert(html.includes('/assets/'+path+'?v=20261030b'),'Returning browsers must request the updated '+path);
+}

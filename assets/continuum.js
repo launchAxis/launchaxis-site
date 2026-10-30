@@ -5,6 +5,12 @@
  const root=document.documentElement,reduce=matchMedia('(prefers-reduced-motion: reduce)'),$=s=>document.querySelector(s);
  if(!('IntersectionObserver' in window)||!('ResizeObserver' in window))return;
  const END=16.9,TIDE_START=8.95,TIDE_END=13.45;
+ // Add scroll space only at fully visible headings. Scene clocks keep their
+ // original timing, and anchors use the inverse mapping in either direction.
+ const READING_HOLDS=[[3.28,2],[8.5,1]];
+ const SCROLL_END=END+READING_HOLDS.reduce((total,[,duration])=>total+duration,0);
+ function storyTime(distance){let offset=0;for(const [at,duration] of READING_HOLDS){if(distance<at+offset)return distance-offset;if(distance<=at+offset+duration)return at;offset+=duration;}return distance-offset;}
+ function scrollTime(t){return t+READING_HOLDS.reduce((total,[at,duration])=>total+(t>at?duration:0),0);}
  const anchors={top:0,main:0,projects:2.65,aventis:4.1,axis:6.1,tide:8.2,'tide-details':13.95,about:15,notes:16.4};
  const clamp=v=>Math.max(0,Math.min(1,v)),mix=(a,b,p)=>a+(b-a)*p,smooth=(a,b,t)=>{const p=clamp((t-a)/(b-a));return p*p*(3-2*p);};
  const windowed=(t,a,b,c,d)=>smooth(a,b,t)*(1-smooth(c,d,t));
@@ -12,7 +18,7 @@
  let state=null,raf=0,last=0,current=0,pace=null,axisVideo=null,createVideo=null;
  import('/assets/scroll-video.js').then(module=>{createVideo=module.createScrollVideo;if(state)axisVideo=createVideo($('#axis-video'),schedule);schedule();}).catch(()=>{/* The original video remains the fallback. */});
  import('/assets/scroll-pace.js').then(({installSteadyWheel})=>{
-  pace=installSteadyWheel(()=>{if(!state||reduce.matches)return null;const start=scrollY+state.track.getBoundingClientRect().top-state.top;return {start,end:start+END*state.unit,unit:state.unit};});
+  pace=installSteadyWheel(()=>{if(!state||reduce.matches)return null;const start=scrollY+state.track.getBoundingClientRect().top-state.top;return {start,end:start+SCROLL_END*state.unit,unit:state.unit};});
  }).catch(()=>{/* The native scroll timeline is a complete fallback. */});
  function sample(keys,t){let a=keys[0],b=keys.at(-1);for(let i=1;i<keys.length;i++){if(t<=keys[i][0]){a=keys[i-1];b=keys[i];break;}}const p=smooth(a[0],b[0],t);return a[1].map((v,i)=>mix(v,b[1][i],p));}
  function mount(){
@@ -38,17 +44,17 @@
  function style(el,key,value){if(!state.styles.has(el))state.styles.set(el,el.getAttribute('style'));el.style.setProperty(key,String(value));}
  function layer(el,alpha,dy=0,interactive=true){const a=clamp(alpha);style(el,'opacity',a.toFixed(4));style(el,'visibility',a<.002?'hidden':'visible');style(el,'--continuum-y',`${dy.toFixed(2)}px`);style(el,'pointer-events',a>.65&&interactive?'auto':'none');el.inert=a<.65||!interactive;el.setAttribute('aria-hidden',a<.15?'true':'false');}
  function card(el,box,opacity){const [x,y,w,h,r]=box;style(el,'left',`${x-w/2}%`);style(el,'top',`${y-h/2}%`);style(el,'width',`${w}%`);style(el,'height',`${h}%`);style(el,'transform',`rotate(${r}deg)`);style(el,'opacity',opacity);style(el,'visibility',opacity<.001?'hidden':'visible');}
- function resize(){if(!state)return;state.top=$('.header').offsetHeight;state.unit=Math.max(520,innerHeight*.92);state.track.style.height=`${END*state.unit+innerHeight-state.top}px`;state.track.style.setProperty('--continuum-top',`${state.top}px`);state.track.style.setProperty('--continuum-height',`${innerHeight-state.top}px`);schedule();}
- function go(t,animated=true){if(!state)return;pace?.stop();const top=scrollY+state.track.getBoundingClientRect().top-state.top+t*state.unit;window.scrollTo({top,behavior:animated?'smooth':'instant'});}
+ function resize(){if(!state)return;state.top=$('.header').offsetHeight;state.unit=Math.max(520,innerHeight*.92);state.track.style.height=`${SCROLL_END*state.unit+innerHeight-state.top}px`;state.track.style.setProperty('--continuum-top',`${state.top}px`);state.track.style.setProperty('--continuum-height',`${innerHeight-state.top}px`);schedule();}
+ function go(t,animated=true){if(!state)return;pace?.stop();const top=scrollY+state.track.getBoundingClientRect().top-state.top+scrollTime(t)*state.unit;window.scrollTo({top,behavior:animated?'smooth':'instant'});}
  function draw(now){
   raf=0;if(!state||document.hidden)return;
-  const s=state,n=s.nodes,mobile=innerWidth<700,rect=s.track.getBoundingClientRect(),desired=Math.max(0,Math.min(END,(s.top-rect.top)/s.unit)),dt=last?Math.min(.05,(now-last)/1000):1/60;last=now;
+  const s=state,n=s.nodes,mobile=innerWidth<700,rect=s.track.getBoundingClientRect(),desired=Math.max(0,Math.min(SCROLL_END,(s.top-rect.top)/s.unit)),dt=last?Math.min(.05,(now-last)/1000):1/60;last=now;
   current=root.classList.contains('steady-scroll-active')||Math.abs(desired-current)>2||!s.drawn?desired:mix(current,desired,1-Math.exp(-15*dt));if(Math.abs(current-desired)<.0002)current=desired;s.drawn=true;
-  const t=current;root.dataset.continuumTime=t.toFixed(4);
+  const t=storyTime(current);root.dataset.continuumTime=t.toFixed(4);
   const rgb=sample(colors,t).map(Math.round),dark=t>1.12&&t<2.4||t>7.08;root.classList.toggle('continuum-dark',dark);root.style.setProperty('--continuum-bg',`rgb(${rgb.join(' ')})`);root.style.setProperty('--continuum-ink',dark?'#edf2e5':'#17271d');
   // The same three images travel from the opening through the manifesto and
   // discipline typography. The Aventis tile lands in the shared project frame.
-  const cardsOut=1-smooth(3.25,3.7,t);
+  const cardsOut=1-smooth(2.92,3.22,t);
   const boatKeys=mobile?[[0,[50,47,84,63,0]],[.8,[50,49,100,94,0]],[1.4,[15,82,36,23,-5]],[2.3,[23,77,41,26,-4]],[3.6,[-30,100,36,28,-12]]]:[[0,[50,47,64,72,0]],[.8,[50,49,100,98,0]],[1.4,[16,79,26,29,-6]],[2.4,[24,80,31,27,-4]],[3.6,[-35,105,30,30,-14]]];
   card(n.boat,sample(boatKeys,t),cardsOut);
   card(n.arm,sample([[0,[4,25,mobile?25:20,30,-5]],[.8,[-20,0,20,30,-9]],[1.4,[mobile?107:94,26,20,30,6]],[2.5,[85,31,24,38,5]],[3.6,[130,0,26,40,12]]],t),cardsOut);
@@ -65,7 +71,8 @@
   for(const [el,start,end] of [[n.aventis,3.4,5.65],[n.axis,5.3,7.55]]){style(el,'--title-slide',`${(1-smooth(start,start+.4,t))*100-smooth(end-.4,end,t)*100}px`);style(el,'--copy-rise',`${(1-smooth(start+.1,start+.55,t))*50}px`);}
   const networkA=windowed(t,3.25,3.75,5.25,5.8),axisA=windowed(t,5.2,5.8,7.3,7.9),tideA=smooth(7.3,7.95,t);
   layer(n.network,networkA,0,false);layer(n.robot,axisA);layer(n.story,tideA);
-  const portalBox=sample(mobile?[[0,[50,38,90,40]],[6.6,[50,38,90,40]],[7.7,[50,50,100,100]],[14.1,[50,50,100,100]],[14.9,[50,26,90,39]],[15.9,[50,26,90,39]],[16.35,[50,24,66,31]],[16.9,[50,24,52,24]]]:[[0,[65,50,62,62]],[5.15,[65,50,62,62]],[5.8,[65,65,62,62]],[6.6,[65,65,62,62]],[7.7,[50,50,100,100]],[14.1,[50,50,100,100]],[14.9,[24,48,44,69]],[15.9,[24,48,44,69]],[16.35,[24,44,37,55]],[16.9,[24,40,30,43]]],t);
+  // Keep the settled video frame unchanged throughout Notes, on both layouts.
+  const portalBox=sample(mobile?[[0,[50,38,90,40]],[6.6,[50,38,90,40]],[7.7,[50,50,100,100]],[14.1,[50,50,100,100]],[14.9,[50,26,90,39]],[15.9,[50,26,90,39]],[16.9,[50,26,90,39]]]:[[0,[65,50,62,62]],[5.15,[65,50,62,62]],[5.8,[65,65,62,62]],[6.6,[65,65,62,62]],[7.7,[50,50,100,100]],[14.1,[50,50,100,100]],[14.9,[24,48,44,69]],[15.9,[24,48,44,69]],[16.9,[24,48,44,69]]],t);
   const [x,y,w,h]=portalBox;style(s.portal,'left',`${x-w/2}%`);style(s.portal,'top',`${y-h/2}%`);style(s.portal,'width',`${w}%`);style(s.portal,'height',`${h}%`);style(s.portal,'opacity',smooth(3.25,3.65,t));style(s.portal,'visibility',t<3.22?'hidden':'visible');
   style(n.network,'--brand-rotate',`${(t-4.5)*8}deg`);style(n.network,'--brand-scale',1+(t-4.5)*.045);
   const axisPanel=$('.axis-3d-panel'),video=$('#axis-video');
@@ -79,18 +86,21 @@
   // Give the introduction and each particle caption readable scroll space.
   // Keep the same 24,625 vertices, camera path and final shot registration.
   n.story.dataset.continuumProgress=clamp((t-TIDE_START)/(TIDE_END-TIDE_START)).toFixed(5);n.story.dataset.continuumActive=String(tideA>.005&&rect.bottom>s.top);
-  // Hold the introduction at full opacity for 1.5 timeline units, then
-  // fully clear it before the vertex heading enters (in either direction).
+  // Axis finishes at 7.9. Only then introduce Blender, with a reading hold,
+  // and fully clear it before the vertex heading enters (in either direction).
   style(n.story,'--continuum-story-ui',smooth(9.38,9.62,t)*(1-smooth(13.4,13.75,t)));
   // Explicit visibility is a second guard against any inherited UI opacity rule.
   style(n.story.querySelector('.tide-story-ui'),'visibility',t<9.38||t>=13.75?'hidden':'visible');
-  layer(n.tide,0);layer(n.prelude,windowed(t,7.25,7.55,9.05,9.35),(1-smooth(7.25,7.6,t))*65);
+  layer(n.tide,0);layer(n.prelude,windowed(t,7.95,8.25,9.05,9.35),(1-smooth(7.95,8.25,t))*65);
   layer(n.description,windowed(t,13.4,13.75,14.3,14.7),(1-smooth(13.4,13.8,t))*55);
   style(n.story,'--continuum-film-shade',windowed(t,13.4,13.75,14.4,14.85)*.5);
   layer(n.studio,windowed(t,14.4,14.85,15.6,15.9),(1-smooth(14.4,14.9,t))*55);
   layer(n.notes,smooth(15.95,16.35,t),(1-smooth(15.95,16.35,t))*50);
   layer(n.toolbar,windowed(t,3.4,3.7,7.1,7.35));
   style(s.badge,'opacity',1-windowed(t,3.3,3.7,13.7,14.2));
+  // The opening already has a project CTA; introduce the scroll hint afterwards.
+  style(s.badge.lastElementChild,'opacity',smooth(1.2,1.4,t));
+  style(s.badge.lastElementChild,'visibility',t<=1.2?'hidden':'visible');
   n.toolbar.querySelectorAll('[data-project-link]').forEach(link=>{const id=t<5.5?'aventis':t<7.5?'axis':'tide';if(link.dataset.projectLink===id)link.setAttribute('aria-current','true');else link.removeAttribute('aria-current');});
   video.dataset.continuumVisible=String(axisA>.05&&render>.05);
   window.dispatchEvent(new CustomEvent('launchaxis:continuum',{detail:{time:t}}));

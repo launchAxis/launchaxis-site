@@ -32,5 +32,7 @@ assert.equal(states(.95).heading,0,'Caption clears before the footage');
 assert(states(.95).reveal>0&&states(.95).reveal<1,'Footage still crossfades');
 assert.equal(states(1).reveal,1);
 const prelude=timeline.match(/layer\(n\.prelude,windowed\(t,([\d.,]+)\)/)[1].split(',').map(Number);
-assert((prelude[2]-prelude[1])/.85>1.7,'Blender title stays fully visible for longer');
+const holds=JSON.parse(timeline.match(/const READING_HOLDS=(\[[^;]+);/)[1]);
+const readingSpace=(a,b)=>b-a+holds.reduce((total,[at,duration])=>total+(at>=a&&at<=b?duration:0),0);
+assert(readingSpace(prelude[1],prelude[2])/.85>1.7,'Blender title stays fully visible for longer');
 console.log('PASS: animation wording, both community links, grouped credit, readable Tide caption holds, Scene navigation and video handover.');

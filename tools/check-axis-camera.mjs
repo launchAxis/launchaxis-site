@@ -14,7 +14,7 @@ class Surface extends EventTarget {
 const send=(host,type,values={})=>{const e=new Event(type,{cancelable:true});Object.assign(e,values);host.dispatchEvent(e);return e;};
 const pointer=(host,type,x,y,button=0)=>send(host,type,{pointerId:1,pointerType:'mouse',clientX:x,clientY:y,pageX:x,pageY:y,button});
 const host=new Surface(),reset=new Surface(),camera=new THREE.PerspectiveCamera(38,2,.01,100);
-camera.position.set(4.8,2.2,5.5);camera.lookAt(0,.05,0);
+camera.position.set(-4.8,2.2,5.5);camera.lookAt(0,.05,0);
 let redraws=0;
 const input=createAxisCameraControls(camera,host,reset,()=>redraws++);
 const homePosition=camera.position.clone(),homeOrientation=camera.quaternion.clone();
@@ -47,5 +47,6 @@ input.dispose();
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 assert(!html.includes('axis-motion-range'),'The old animation slider must be removed');
 const runtime=readFileSync(new URL('../assets/scroll-runtime.src.js',import.meta.url),'utf8');
+assert(runtime.includes('camera.position.set(-4.8,2.2,5.5)'),'The opening and reset camera should give a side view');
 assert(!/turntable\.rotation\.y\s*=.*progress/.test(runtime),'Scroll must not rotate the whole model around a stationary camera');
 console.log('PASS: drag orbit, persistent camera during pose updates, native wheel/touch scrolling, keyboard access, reset, and slider removal.');

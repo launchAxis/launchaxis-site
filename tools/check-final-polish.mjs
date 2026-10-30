@@ -16,7 +16,7 @@ assert(timeline.includes('smooth(9.38,9.62,t)*(1-smooth(13.4,13.75,t))'));
 const clamp=v=>Math.max(0,Math.min(1,v));
 const smooth=(a,b,t)=>{const p=clamp((t-a)/(b-a));return p*p*(3-2*p)};
 for(let t=7;t<10;t+=.001){
- const prelude=smooth(7.25,7.55,t)*(1-smooth(9.05,9.35,t));
+ const prelude=smooth(7.95,8.25,t)*(1-smooth(9.05,9.35,t));
  const vertices=smooth(9.38,9.62,t)*(1-smooth(13.4,13.75,t));
  assert.equal(prelude*vertices,0,'Tide intro and vertex copy cannot be visible together, in either scroll direction');
 }
@@ -26,5 +26,6 @@ assert(timeline.includes("t<9.38||t>=13.75?'hidden':'visible'"),'Tide UI must al
 assert.equal((html.match(/class="credit-arrow"/g)||[]).length,2);
 assert(css.includes('display:inline-flex;flex-direction:row;flex-wrap:nowrap;'));
 for(const path of ['continuum.js','continuum.css','render.css','site.js']){
- assert(html.includes('/assets/'+path+'?v=20261030d'),'Returning browsers must request the updated '+path);
+ const version=path.startsWith('continuum.')?'20261030h':'20261030d';
+ assert(html.includes('/assets/'+path+'?v='+version),'Returning browsers must request the updated '+path);
 }

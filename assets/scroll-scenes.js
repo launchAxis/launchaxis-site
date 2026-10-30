@@ -5,7 +5,7 @@ if(targets.length && 'IntersectionObserver' in window){
   const eligible=()=>!navigator.connection?.saveData&&!document.documentElement.classList.contains('motion-paused')&&!matchMedia('(prefers-reduced-motion: reduce)').matches;
   function request(target){
     if(!target||!eligible()||requested.has(target))return;
-    requested.add(target);runtime??=import('./scroll-runtime.js?v=20261030d');
+    requested.add(target);runtime??=import('./scroll-runtime.js?v=20261030h');
     runtime.then(m=>{if(m.boot(target.id))observer.unobserve(target);else requested.delete(target);}).catch(()=>{requested.delete(target);runtime=null;});
   }
   const observer=new IntersectionObserver(entries=>{
@@ -13,7 +13,7 @@ if(targets.length && 'IntersectionObserver' in window){
     entries.filter(e=>e.isIntersecting).forEach(({target})=>{
       if(requested.has(target))return;
       requested.add(target);
-      runtime??=import('./scroll-runtime.js?v=20261030d');
+      runtime??=import('./scroll-runtime.js?v=20261030h');
       runtime.then(m=>{
         if(m.boot(target.id)){observer.unobserve(target);}
         else{requested.delete(target);}

@@ -220,7 +220,9 @@ async function axis(){
   const box=new THREE.Box3().setFromObject(model),size=box.getSize(vec()),center=box.getCenter(vec()),scale=3/Math.max(size.x,size.y,size.z);
   const rig=new THREE.Group();rig.scale.setScalar(scale);rig.position.copy(center).multiplyScalar(-scale);rig.add(model);
   const turntable=new THREE.Group();turntable.rotation.y=-.55;turntable.add(rig);scene.add(turntable);
-  const camera=new THREE.PerspectiveCamera(38,1,.01,100);camera.position.set(4.8,2.2,5.5);camera.lookAt(0,.05,0);
+  // Start across the arm's reach plane so the elbow and gripper read in profile.
+  // This is only the initial/reset view; scrolling never changes an orbit choice.
+  const camera=new THREE.PerspectiveCamera(38,1,.01,100);camera.position.set(-4.8,2.2,5.5);camera.lookAt(0,.05,0);
   const floor=new THREE.Mesh(new THREE.PlaneGeometry(7,7),new THREE.MeshStandardMaterial({color:0xe7e9df,roughness:1,transparent:true,opacity:.65,side:THREE.DoubleSide}));
   floor.rotation.x=-Math.PI/2;floor.position.y=(box.min.y-center.y)*scale-.025;floor.receiveShadow=true;floor.userData.canvasFloor=true;scene.add(floor);
   if(!renderer.isCanvasFallback){

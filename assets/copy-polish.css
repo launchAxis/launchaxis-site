@@ -26,3 +26,11 @@
 .work-intro p:only-child{font-size:inherit;flex:auto}
 .continuum-stage .work-intro p:only-child{font-size:clamp(15px,1.35vw,20px)}
 @media(max-width:700px){.continuum-stage .work-intro p:only-child{font-size:13px}}
+/* A three-second onboarding hint; never changes header or wordmark sizing. */
+.header .brand{position:relative;min-height:44px;display:flex;align-items:center}
+.header .brand-home-hint{position:absolute;left:0;top:calc(100% + 6px);width:246px;max-width:calc(100vw - 40px);display:flex;align-items:center;gap:8px;padding:10px 12px;background:#eef1e5;color:#263d2d;border:1px solid #263d2d26;border-radius:12px;box-shadow:0 5px 20px #14251a10;font:12px/1.45 Arial,sans-serif;letter-spacing:0;pointer-events:none;opacity:1;transition:opacity .4s}
+.header .brand-home-hint[hidden]{display:none}
+.header .brand-home-hint.is-leaving{opacity:0}
+.header .brand .brand-home-arrow{display:block;width:24px;height:24px;flex:0 0 24px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;filter:none;mix-blend-mode:normal}
+@media(max-width:700px){.header .brand-home-hint{width:222px;font-size:11px;top:calc(100% + 2px)}}
+@media(prefers-reduced-motion:reduce){.header .brand-home-hint{transition:none}}

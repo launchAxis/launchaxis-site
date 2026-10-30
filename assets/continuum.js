@@ -33,7 +33,7 @@
   const network=move($('.network-visual'),portal),robot=move($('.render-block'),portal),story=move($('.tide-story'),portal);
   const description=move($('.tide-description'),stage),prelude=move($('.tide-prelude'),stage);
   const nodes={hero,manifesto,discipline,work,aventis,axis,tide,studio,notes,toolbar,boat,arm,ai,network,robot,story,description,prelude};
-  const badge=document.createElement('div');badge.className='continuum-caption mono';badge.setAttribute('aria-hidden','true');badge.innerHTML='<span>LAUNCHAXIS / PROJECTS</span><span>SCROLL TO CONTINUE ↓</span>';stage.append(badge);
+  const badge=document.createElement('div');badge.className='continuum-caption mono';badge.setAttribute('aria-hidden','true');badge.innerHTML='<span>LAUNCHAXIS / PROJECTS</span><span>SCROLL TO CONTINUE <span class="arrow-text" aria-hidden="true">↓</span><svg class="mobile-arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4v16m-6-6 6 6 6-6"/></svg></span>';stage.append(badge);
   state={track,stage,portal,images,moved,styles,attributes,nodes,badge,unit:1,top:0};
   if(createVideo&&!axisVideo)axisVideo=createVideo($('#axis-video'),schedule);
   for(const el of Object.values(nodes))attributes.set(el,{inert:el.inert,hidden:el.getAttribute('aria-hidden')});

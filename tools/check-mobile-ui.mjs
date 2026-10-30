@@ -3,6 +3,7 @@ import {readFileSync} from 'node:fs';
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const css=readFileSync(new URL('../assets/mobile-ui.css',import.meta.url),'utf8');
 const editorial=readFileSync(new URL('../assets/editorial.css',import.meta.url),'utf8');
+const timeline=readFileSync(new URL('../assets/continuum.js',import.meta.url),'utf8');
 const icons=[...html.matchAll(/<svg class="mobile-arrow-icon"[^>]*>(.*?)<\/svg>/g)];
 assert.equal(icons.length,22,'General directional arrows should have a phone SVG alternative; the internal Contact link is plain text');
 assert(icons.every(icon=>icon[1].includes('<path d="')),'Icons must be vector paths, not emoji text');
@@ -12,12 +13,19 @@ assert(phone.includes('.main-nav a:nth-child(2){display:flex}'),'The Studio link
 assert(phone.includes('.arrow-text{display:none!important}'),'Phone emoji glyphs must be replaced');
 assert(phone.includes('.mobile-arrow-icon{display:inline-block;'),'Phone SVG icons must be visible');
 assert(!css.slice(0,css.indexOf('@media')).includes('.header-inner{'),'Navigation adjustments must remain phone-only');
+assert(css.includes('@media(max-width:700px),(pointer:coarse){'),'Touchscreens must keep vector arrows after rotating past the narrow-width breakpoint');
+assert(!css.match(/@media\(max-width:700px\),\(pointer:coarse\)\{[^]*?\n\}/)[0].includes('.header-inner'),'Landscape icon fix must not change desktop or wide-screen navigation sizing');
+const caption=timeline.match(/badge\.innerHTML='(.*?)';/)[1];
+assert(caption.includes('class="arrow-text"')&&caption.includes('class="mobile-arrow-icon"'),'The generated scroll caption must also use the vector alternative');
+assert(html.includes('href="#top" aria-label="LaunchAxis home — back to top"'),'The header logo is the accessible Home link');
+assert(timeline.includes('const anchors={top:0,'),'Home must return to the start of the continuous timeline');
+assert(html.includes('/assets/mobile-ui.css?v=20261030k'),'Returning phones must request the fixed icon CSS');
 assert(html.includes('filter="url(#footer-wordmark-ink)"'),'The footer must use the transparency filter');
 assert(editorial.includes('.footer-brand svg{filter:none;mix-blend-mode:normal}'),'The footer must not invert the transparent wordmark again');
 const opacity=(r,g,b,a)=>Math.max(0,Math.min(1,a-.2126*r-.7152*g-.0722*b));
 assert(opacity(1,1,1,1)<1e-9,'White background must be transparent');
 assert.equal(opacity(0,0,0,1),1,'Dark wordmark must remain visible');
 assert.equal(opacity(0,0,0,0),0,'Transparent pixels must stay transparent');
-console.log('PASS: phone-only SVG icons and full navigation; footer transparency preserves the existing wordmark.');
+console.log('PASS: portrait and landscape touchscreen SVG icons, logo Home link, full navigation and footer transparency.');
 
 assert.equal((html.match(/class="credit-arrow"/g)||[]).length,2,'Both designer credits use an always-visible SVG arrow');

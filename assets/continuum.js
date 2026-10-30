@@ -4,11 +4,11 @@
  'use strict';
  const root=document.documentElement,reduce=matchMedia('(prefers-reduced-motion: reduce)'),$=s=>document.querySelector(s);
  if(!('IntersectionObserver' in window)||!('ResizeObserver' in window))return;
- const END=14.5,TIDE_START=7.75,TIDE_END=11.05;
- const anchors={top:0,main:0,projects:2.65,aventis:4.1,axis:6.1,tide:7.55,'tide-details':11.55,about:12.6,notes:14};
+ const END=16.9,TIDE_START=8.95,TIDE_END=13.45;
+ const anchors={top:0,main:0,projects:2.65,aventis:4.1,axis:6.1,tide:8.2,'tide-details':13.95,about:15,notes:16.4};
  const clamp=v=>Math.max(0,Math.min(1,v)),mix=(a,b,p)=>a+(b-a)*p,smooth=(a,b,t)=>{const p=clamp((t-a)/(b-a));return p*p*(3-2*p);};
  const windowed=(t,a,b,c,d)=>smooth(a,b,t)*(1-smooth(c,d,t));
- const colors=[[0,[245,245,239]],[.85,[245,245,239]],[1.35,[23,45,35]],[2.2,[23,45,35]],[2.6,[217,235,173]],[3.1,[217,235,173]],[3.65,[245,245,239]],[6.6,[245,245,239]],[7.5,[16,21,15]],[11.8,[16,21,15]],[12.7,[31,53,36]],[13.8,[31,53,36]],[14.5,[20,37,26]]];
+ const colors=[[0,[245,245,239]],[.85,[245,245,239]],[1.35,[23,45,35]],[2.2,[23,45,35]],[2.6,[217,235,173]],[3.1,[217,235,173]],[3.65,[245,245,239]],[6.6,[245,245,239]],[7.5,[16,21,15]],[14.2,[16,21,15]],[15.1,[31,53,36]],[16.2,[31,53,36]],[16.9,[20,37,26]]];
  let state=null,raf=0,last=0,current=0,pace=null,axisVideo=null,createVideo=null;
  import('/assets/scroll-video.js').then(module=>{createVideo=module.createScrollVideo;if(state)axisVideo=createVideo($('#axis-video'),schedule);schedule();}).catch(()=>{/* The original video remains the fallback. */});
  import('/assets/scroll-pace.js').then(({installSteadyWheel})=>{
@@ -65,7 +65,7 @@
   for(const [el,start,end] of [[n.aventis,3.4,5.65],[n.axis,5.3,7.55]]){style(el,'--title-slide',`${(1-smooth(start,start+.4,t))*100-smooth(end-.4,end,t)*100}px`);style(el,'--copy-rise',`${(1-smooth(start+.1,start+.55,t))*50}px`);}
   const networkA=windowed(t,3.25,3.75,5.25,5.8),axisA=windowed(t,5.2,5.8,7.3,7.9),tideA=smooth(7.3,7.95,t);
   layer(n.network,networkA,0,false);layer(n.robot,axisA);layer(n.story,tideA);
-  const portalBox=sample(mobile?[[0,[50,38,90,40]],[6.6,[50,38,90,40]],[7.7,[50,50,100,100]],[11.7,[50,50,100,100]],[12.5,[50,26,90,39]],[13.5,[50,26,90,39]],[13.95,[50,24,66,31]],[14.5,[50,24,52,24]]]:[[0,[65,50,62,62]],[5.15,[65,50,62,62]],[5.8,[65,65,62,62]],[6.6,[65,65,62,62]],[7.7,[50,50,100,100]],[11.7,[50,50,100,100]],[12.5,[24,48,44,69]],[13.5,[24,48,44,69]],[13.95,[24,44,37,55]],[14.5,[24,40,30,43]]],t);
+  const portalBox=sample(mobile?[[0,[50,38,90,40]],[6.6,[50,38,90,40]],[7.7,[50,50,100,100]],[14.1,[50,50,100,100]],[14.9,[50,26,90,39]],[15.9,[50,26,90,39]],[16.35,[50,24,66,31]],[16.9,[50,24,52,24]]]:[[0,[65,50,62,62]],[5.15,[65,50,62,62]],[5.8,[65,65,62,62]],[6.6,[65,65,62,62]],[7.7,[50,50,100,100]],[14.1,[50,50,100,100]],[14.9,[24,48,44,69]],[15.9,[24,48,44,69]],[16.35,[24,44,37,55]],[16.9,[24,40,30,43]]],t);
   const [x,y,w,h]=portalBox;style(s.portal,'left',`${x-w/2}%`);style(s.portal,'top',`${y-h/2}%`);style(s.portal,'width',`${w}%`);style(s.portal,'height',`${h}%`);style(s.portal,'opacity',smooth(3.25,3.65,t));style(s.portal,'visibility',t<3.22?'hidden':'visible');
   style(n.network,'--brand-rotate',`${(t-4.5)*8}deg`);style(n.network,'--brand-scale',1+(t-4.5)*.045);
   const axisPanel=$('.axis-3d-panel'),video=$('#axis-video');
@@ -76,20 +76,21 @@
   const sceneReady=axisPanel.dataset.sceneState==='ready',sceneFailed=axisPanel.dataset.sceneState==='error';
   const render=sceneFailed?1:sceneReady&&video.dataset.scrubReady==='true'?smooth(6.55,7.05,t):0;style(n.robot,'--render-mix',render);
   axisPanel.dataset.continuumProgress=clamp((t-5.65)/1.35).toFixed(5);axisPanel.dataset.continuumActive=String(axisA>.01&&render<.995);axisPanel.inert=render>.8;
-  // This is the existing Tide timeline, unmodified: only its source of progress
-  // comes from the shared stage. Its 24,625 vertices and shot registration stay.
+  // Give the introduction and each particle caption readable scroll space.
+  // Keep the same 24,625 vertices, camera path and final shot registration.
   n.story.dataset.continuumProgress=clamp((t-TIDE_START)/(TIDE_END-TIDE_START)).toFixed(5);n.story.dataset.continuumActive=String(tideA>.005&&rect.bottom>s.top);
-  // The introductory title is fully gone at 8.15 before the vertex copy enters.
-  style(n.story,'--continuum-story-ui',smooth(8.18,8.42,t)*(1-smooth(11.0,11.35,t)));
+  // Hold the introduction at full opacity for 1.5 timeline units, then
+  // fully clear it before the vertex heading enters (in either direction).
+  style(n.story,'--continuum-story-ui',smooth(9.38,9.62,t)*(1-smooth(13.4,13.75,t)));
   // Explicit visibility is a second guard against any inherited UI opacity rule.
-  style(n.story.querySelector('.tide-story-ui'),'visibility',t<8.18||t>=11.35?'hidden':'visible');
-  layer(n.tide,0);layer(n.prelude,windowed(t,7.25,7.55,7.85,8.15),(1-smooth(7.25,7.6,t))*65);
-  layer(n.description,windowed(t,11.0,11.35,11.9,12.3),(1-smooth(11,11.4,t))*55);
-  style(n.story,'--continuum-film-shade',windowed(t,11.0,11.35,12,12.45)*.5);
-  layer(n.studio,windowed(t,12.0,12.45,13.2,13.5),(1-smooth(12.0,12.5,t))*55);
-  layer(n.notes,smooth(13.55,13.95,t),(1-smooth(13.55,13.95,t))*50);
+  style(n.story.querySelector('.tide-story-ui'),'visibility',t<9.38||t>=13.75?'hidden':'visible');
+  layer(n.tide,0);layer(n.prelude,windowed(t,7.25,7.55,9.05,9.35),(1-smooth(7.25,7.6,t))*65);
+  layer(n.description,windowed(t,13.4,13.75,14.3,14.7),(1-smooth(13.4,13.8,t))*55);
+  style(n.story,'--continuum-film-shade',windowed(t,13.4,13.75,14.4,14.85)*.5);
+  layer(n.studio,windowed(t,14.4,14.85,15.6,15.9),(1-smooth(14.4,14.9,t))*55);
+  layer(n.notes,smooth(15.95,16.35,t),(1-smooth(15.95,16.35,t))*50);
   layer(n.toolbar,windowed(t,3.4,3.7,7.1,7.35));
-  style(s.badge,'opacity',1-windowed(t,3.3,3.7,11.3,11.8));
+  style(s.badge,'opacity',1-windowed(t,3.3,3.7,13.7,14.2));
   n.toolbar.querySelectorAll('[data-project-link]').forEach(link=>{const id=t<5.5?'aventis':t<7.5?'axis':'tide';if(link.dataset.projectLink===id)link.setAttribute('aria-current','true');else link.removeAttribute('aria-current');});
   video.dataset.continuumVisible=String(axisA>.05&&render>.05);
   window.dispatchEvent(new CustomEvent('launchaxis:continuum',{detail:{time:t}}));

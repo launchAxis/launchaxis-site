@@ -4,7 +4,7 @@ const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const css=readFileSync(new URL('../assets/mobile-ui.css',import.meta.url),'utf8');
 const editorial=readFileSync(new URL('../assets/editorial.css',import.meta.url),'utf8');
 const icons=[...html.matchAll(/<svg class="mobile-arrow-icon"[^>]*>(.*?)<\/svg>/g)];
-assert.equal(icons.length,21,'General directional arrows should have a phone SVG alternative');
+assert.equal(icons.length,23,'General directional arrows should have a phone SVG alternative');
 assert(icons.every(icon=>icon[1].includes('<path d="')),'Icons must be vector paths, not emoji text');
 assert(css.includes('.mobile-arrow-icon{display:none;'),'Desktop must retain its current arrow rendering');
 const phone=css.slice(css.indexOf('@media(max-width:700px)'));

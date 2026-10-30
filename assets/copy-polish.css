@@ -11,3 +11,12 @@
  .contact .footer{grid-template-columns:1fr auto;gap:18px}
  .contact .footer>.footer-joke{grid-column:1/-1;grid-row:1;text-align:left;justify-self:start;max-width:100%;font-size:12px;min-height:4.8em}
 }
+
+/* Keep the designer phrase together; only the rendering credit sits opposite. */
+.render-block figcaption,.continuum-portal .render-block>figcaption{display:flex;align-items:baseline;justify-content:space-between;gap:8px 20px;flex-wrap:wrap}
+.render-block figcaption>.arm-designer{display:inline-flex;align-items:baseline;gap:.35em;white-space:nowrap;font-size:inherit;color:inherit}
+.render-block figcaption>.render-credit{margin-left:auto}
+/* The project introduction now contains one paragraph. */
+.work-intro p:only-child{font-size:inherit;flex:auto}
+.continuum-stage .work-intro p:only-child{font-size:clamp(15px,1.35vw,20px)}
+@media(max-width:700px){.continuum-stage .work-intro p:only-child{font-size:13px}}

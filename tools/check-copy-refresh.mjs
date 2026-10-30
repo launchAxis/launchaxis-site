@@ -5,7 +5,7 @@ import {footerJokes,chooseFooterJoke} from '../assets/footer-joke.js';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const html=read('index.html'),timeline=read('assets/continuum.js'),runtime=read('assets/scroll-runtime.src.js');
 assert(html.includes('<span>Ideas worth</span><span class="hero-last">bringing to <em>life.</em></span>'));
-for(const phrase of ['Where it all starts','About Aventis','About Axis','About LaunchAxis','Notes from the projects.','More here soon','Inspired by the film <em>Flow</em>',"The robotic arm is just one part of Axis"]){assert(html.includes(phrase),phrase);}
+for(const phrase of ['Where it all starts','About Aventis','About Axis','About LaunchAxis','Notes from the projects.','More here soon','Inspired by the animation <em>Flow</em>',"The robotic arm is just one part of Axis"]){assert(html.includes(phrase),phrase);}
 assert(!html.includes('class="principles"'));
 assert(!timeline.includes('principles'));
 assert(!html.includes('social-number'));
@@ -25,5 +25,5 @@ const run=store=>vm.runInNewContext(source,{document:{querySelector:()=>node},se
 run(storage);const first=node.textContent;run(storage);assert.notEqual(node.textContent,first);
 run({getItem(){throw Error('denied');},setItem(){throw Error('denied');}});assert(footerJokes.includes(node.textContent));
 assert(!source.includes('addEventListener'),'No scroll or navigation-triggered joke changes');
-assert(timeline.includes('END=14.5'));
+assert(timeline.includes('END=16.9'));
 console.log('PASS: approved copy, retained hero, no Principles or numbering, new runtime captions; six jokes, reload-only, no immediate repeat and storage fallback.');

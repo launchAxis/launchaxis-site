@@ -131,7 +131,7 @@ async function tide(){
   let failed=false,lastPhase=-1,last=-1,progress=0,width=0,height=0;
   const label=story.querySelector('.story-kicker'),statement=story.querySelector('.story-statement'),buttons=[...story.querySelectorAll('[data-story-step]')];
   const uiControls=[...ui.querySelectorAll('button,a')];
-  const stateCopy=[['VERTICES','One piece at a time...'],['FORM','The boat takes shape.'],['SCENE','The scene comes together.']];
+  const stateCopy=[['VERTICES','One piece at a time...'],['FORM','Taking shape...'],['SCENE','Coming together...']];
   video.dataset.storyManaged='true';video.autoplay=false;video.pause();
   // End on the source Blender camera. Verify the shot match in browser QA.
   video.preload='auto';video.addEventListener('loadeddata',schedule,{once:true});video.load();
@@ -162,8 +162,8 @@ async function tide(){
    if(!visible){video.pause();last=-1;return false;}
    progress=last<0?desired:THREE.MathUtils.lerp(progress,desired,frameBlend);
    if(Math.abs(progress-desired)<.00015)progress=desired;
-   if(progress===last){if(progress>.88&&video.paused)video.play().catch(()=>{video.controls=true;});return false;}last=progress;
-   const p=progress,assembly=smooth(.01,.43,p),turn=smooth(.32,.69,p),reveal=smooth(.76,.88,p),dock=smooth(.92,1,p);
+   if(progress===last){if(progress>.98&&video.paused)video.play().catch(()=>{video.controls=true;});return false;}last=progress;
+   const p=progress,assembly=smooth(.01,.43,p),turn=smooth(.32,.69,p),reveal=smooth(.92,.98,p),dock=smooth(.98,1,p);
    particleMaterial.uniforms.uAssembly.value=assembly;
    particleMaterial.uniforms.uOpacity.value=.5+assembly*.28;
    particleMaterial.uniforms.uPointSize.value=THREE.MathUtils.lerp(2,1.35,assembly);
@@ -186,18 +186,18 @@ async function tide(){
    registration.set(1+(ax-1)*aligned,bx*sx/sy*aligned,0,cx*sx*aligned,ay*sy/sx*aligned,1+(by-1)*aligned,0,cy*sy*aligned,0,0,1,0,0,0,0,1);
    camera.projectionMatrix.premultiply(registration);camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
    renderer.render(scene,camera);
-   const phase=p<.39?0:p<.72?1:2;
+   const phase=p<.39?0:p<.62?1:2;
    if(phase!==lastPhase){lastPhase=phase;label.textContent=stateCopy[phase][0];statement.innerHTML=stateCopy[phase][1];buttons.forEach((b,i)=>{if(i===phase)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});}
    story.style.setProperty('--scene-reveal',reveal.toFixed(4));
    story.style.setProperty('--model-opacity',(1-reveal).toFixed(4));
-   story.style.setProperty('--heading-opacity',(1-smooth(.68,.76,p)).toFixed(4));
-   story.style.setProperty('--ui-opacity',(1-smooth(.84,.91,p)).toFixed(4));
+   story.style.setProperty('--heading-opacity',(1-smooth(.88,.92,p)).toFixed(4));
+   story.style.setProperty('--ui-opacity',(1-smooth(.94,.99,p)).toFixed(4));
    story.style.setProperty('--story-scale',(1-dock*.075).toFixed(4));
    story.style.setProperty('--story-progress',p.toFixed(4));
-   story.style.setProperty('--video-events',p>.83?'auto':'none');
-   ui.inert=p>.91;
-   uiControls.forEach(el=>el.tabIndex=p>.91?-1:0);
-   if(p>.88&&!document.hidden){if(video.paused)video.play().catch(()=>{video.controls=true;});}
+   story.style.setProperty('--video-events',p>.98?'auto':'none');
+   ui.inert=p>.99;
+   uiControls.forEach(el=>el.tabIndex=p>.99?-1:0);
+   if(p>.98&&!document.hidden){if(video.paused)video.play().catch(()=>{video.controls=true;});}
    else {video.pause();if(video.readyState>0&&video.currentTime>.01)video.currentTime=0;}
    return Math.abs(progress-desired)>.00015;
   });

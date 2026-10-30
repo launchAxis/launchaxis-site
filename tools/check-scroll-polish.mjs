@@ -24,6 +24,7 @@ assert(timeline.includes('const cardsOut=1-smooth(2.92,3.22,t)'),'Travelling ima
 assert(readableBlender/.85>1.5&&readableBlender/.85<1.85,'Blender introduction should have a shorter, readable pause');
 for(let t=0;t<=END;t+=.01)assert(Math.abs(storyTime(scrollTime(t))-t)<1e-10,'Anchors must use inverse timing');
 assert(Math.abs(storyTime(SCROLL_END)-END)<1e-10,'The timeline must still reach the footer');
+assert(timeline.includes('axis:5.8'),'Axis links should land on the right-facing opening, not the later turning pose');
 const sample=vm.runInNewContext(timeline.match(/ function sample[^\n]+/)[0]+';sample',{smooth,mix});
 const boxes=timeline.match(/const portalBox=sample\((mobile\?[^;]+),t\);/)[1];
 for(const mobile of [false,true]){

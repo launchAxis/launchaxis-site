@@ -11,7 +11,7 @@
  const SCROLL_END=END+READING_HOLDS.reduce((total,[,duration])=>total+duration,0);
  function storyTime(distance){let offset=0;for(const [at,duration] of READING_HOLDS){if(distance<at+offset)return distance-offset;if(distance<=at+offset+duration)return at;offset+=duration;}return distance-offset;}
  function scrollTime(t){return t+READING_HOLDS.reduce((total,[at,duration])=>total+(t>at?duration:0),0);}
- const anchors={top:0,main:0,projects:2.65,aventis:4.1,axis:6.1,tide:8.2,'tide-details':13.95,about:15,notes:16.4};
+ const anchors={top:0,main:0,projects:2.65,aventis:4.1,axis:5.8,tide:8.2,'tide-details':13.95,about:15,notes:16.4};
  const clamp=v=>Math.max(0,Math.min(1,v)),mix=(a,b,p)=>a+(b-a)*p,smooth=(a,b,t)=>{const p=clamp((t-a)/(b-a));return p*p*(3-2*p);};
  const windowed=(t,a,b,c,d)=>smooth(a,b,t)*(1-smooth(c,d,t));
  const colors=[[0,[245,245,239]],[.85,[245,245,239]],[1.35,[23,45,35]],[2.2,[23,45,35]],[2.6,[217,235,173]],[3.1,[217,235,173]],[3.65,[245,245,239]],[6.6,[245,245,239]],[7.5,[16,21,15]],[14.2,[16,21,15]],[15.1,[31,53,36]],[16.2,[31,53,36]],[16.9,[20,37,26]]];

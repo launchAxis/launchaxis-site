@@ -1,31 +1,15 @@
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
-import vm from 'node:vm';
+import {readFileSync,existsSync} from 'node:fs';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const html=read('index.html'),css=read('assets/copy-polish.css');
 const brand=html.match(/<a class="brand"[^]*?<\/a>/)[0];
-assert(brand.includes('href="#top"'),'The cue must share the existing Home destination');
+assert(brand.includes('href="#top"'),'The logo remains a native Home link');
 assert(brand.includes('aria-label="LaunchAxis home — back to top"'));
-assert.equal((brand.match(/class="brand-home-arrow"/g)||[]).length,1);
-assert(brand.includes('<path d="M19 21C19 12 10 14 6 5m-1 8 1-8 8 2"/>'),'The curved return cue is a vector, not an emoji');
-assert(css.includes('filter:none;mix-blend-mode:normal'),'The arrow uses current text ink instead of the wordmark inversion filter');
-assert(css.includes('position:absolute;left:64px;top:calc(100% + 6px)'),'The hint moves right without moving the logo or navigation');
-assert(css.includes('.header .brand-home-hint{left:32px;width:222px;max-width:calc(100vw - 72px)'),'Phones use a smaller rightward offset and a viewport-safe width');
-const hintStyle=css.match(/\.header \.brand-home-hint\{([^}]+)\}/)[1];
-for(const declaration of ['padding:0','background:transparent','border:0','border-radius:0','box-shadow:none']){
- assert(hintStyle.split(';').includes(declaration),`The text-only hint must retain ${declaration}`);
-}
-assert(css.includes('@media(prefers-reduced-motion:reduce)'));
-assert(html.includes('/assets/copy-polish.css?v=20261031a'),'Returning visitors request the updated cue styling');
-for(const coarse of [false,true]){
- const timers=[];const classes=new Set();const copy={textContent:'Click the logo to go to the beginning.'};
- const hint={hidden:true,classList:{add:v=>classes.add(v)},querySelector:()=>copy};
- vm.runInNewContext(read('assets/home-hint.js'),{document:{querySelector:()=>hint},matchMedia:()=>({matches:coarse}),requestAnimationFrame:fn=>fn(),setTimeout:(fn,time)=>timers.push({fn,time})});
- assert.equal(hint.hidden,false);
- assert.equal(copy.textContent,`${coarse?'Tap':'Click'} the logo to go to the beginning.`);
- assert.deepEqual(timers.map(x=>x.time),[2600,3000]);
- timers[0].fn();assert(classes.has('is-leaving'));
- timers[1].fn();assert.equal(hint.hidden,true);
-}
-console.log('PASS: accessible logo link, curved SVG hint, Click/Tap wording and automatic fade/removal by three seconds.');
-
+assert(brand.includes('/assets/launchaxis-wordmark.png'),'Keep the existing wordmark');
+assert(!html.includes('brand-home-hint'),'Remove the entire temporary hint');
+assert(!html.includes('home-hint.js'),'Do not load the removed hint script');
+assert(!css.includes('brand-home-hint')&&!css.includes('brand-home-arrow'),'Remove unused cue styling');
+assert(!existsSync(new URL('../assets/home-hint.js',import.meta.url)),'Remove the unused cue script');
+assert(css.includes('min-height:44px;display:flex;align-items:center'),'Preserve the logo touch target and alignment');
+assert(html.includes('/assets/copy-polish.css?v=20261031b'),'Refresh the stylesheet cache');
+console.log('PASS: temporary hint removed; native accessible logo Home link and layout retained.');
